@@ -20,5 +20,8 @@ return Application::configure(basePath: dirname(__DIR__))
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
-    })->create()
+    })
+    ->withCommands([
+        \App\Console\Commands\SetupCommand::class,
+    ])->create()
     ->usePublicPath(realpath(base_path('../public_html')));

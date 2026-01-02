@@ -11,11 +11,11 @@ Website Starter Kit for laravel with Custom cms
 ## Installation
 1. Clone the repository:
     ```bash
-    git clone https://github.com/gogilo2003/website-starter-kit.git
+    git clone https://github.com/gogilo2003/website-starter-kit.git [new-project-name]
     ```
 2. Navigate to the project directory:
     ```bash
-    cd website-starter-kit
+    cd new-project-name
     cd laravel
     ```
 3. Install dependencies:

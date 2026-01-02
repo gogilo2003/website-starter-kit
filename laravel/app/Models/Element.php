@@ -11,6 +11,21 @@ class Element extends Model
     use HasFactory;
 
     /**
+     * Automatically handle content hashing
+     */
+    protected static function booted(): void
+    {
+        static::saving(function (Element $element) {
+            // Only hash when content is present
+            if ($element->isDirty('content')) {
+                $element->content_hash = $element->content
+                    ? hash('sha256', $element->content)
+                    : null;
+            }
+        });
+    }
+
+    /**
      * The page_sections that belong to the Element
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany

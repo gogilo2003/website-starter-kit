@@ -15,7 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('name')->unique();
             $table->string('title')->unique();
-            $table->longText('content')->nullable()->unique();
+            $table->longText('content')->nullable();
+            $table->char('content_hash', 64)->nullable()->default(null)->unique();
             $table->enum('type', ['text', 'multiline', 'richtext'])->nullable()->default(null);
             $table->string('photo')->nullable()->default(null);
             $table->string('icon')->nullable()->default(null);
