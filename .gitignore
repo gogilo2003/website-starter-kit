@@ -1,0 +1,9 @@
+public_html/hot
+public_html/build/*
+public_html/storage
+/*.tar.gz
+/*.zip
+/*.tar
+/*.tgz
+prelimenaries/src/.~*
+laravel/storage/data
