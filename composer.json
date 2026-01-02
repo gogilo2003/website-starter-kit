@@ -24,33 +24,6 @@
             "@php laravel/artisan migrate --force",
             "npm --prefix laravel install",
             "npm --prefix laravel run build"
-        ],
-        "dev": [
-            "Composer\\Config::disableProcessTimeout",
-            "npx concurrently -c \"#93c5fd,#c4b5fd,#fb7185,#fdba74\" \"php laravel/artisan serve\" \"php laravel/artisan queue:listen --tries=1\" \"php laravel/artisan pail --timeout=0\" \"npm --prefix laravel run dev\" --names=server,queue,logs,vite --kill-others"
-        ],
-        "test": [
-            "@php laravel/artisan config:clear --ansi",
-            "@php laravel/artisan test"
-        ],
-        "post-root-package-install": [
-            "@php -r \"file_exists('laravel/.env') || copy('laravel/.env.example', 'laravel/.env');\""
-        ],
-        "post-create-project-cmd": [
-            "composer install --working-dir=laravel",
-            "@php laravel/artisan key:generate --ansi",
-            "@php -r \"file_exists('laravel/database/database.sqlite') || touch('laravel/database/database.sqlite');\"",
-            "@php laravel/artisan migrate --graceful --ansi"
-        ],
-        "post-autoload-dump": [
-            "composer dump-autoload --working-dir=laravel",
-            "@php laravel/artisan package:discover --ansi"
-        ],
-        "post-update-cmd": [
-            "@php laravel/artisan vendor:publish --tag=laravel-assets --ansi --force"
-        ],
-        "pre-package-uninstall": [
-            "Illuminate\\Foundation\\ComposerScripts::prePackageUninstall"
         ]
     }
 }
