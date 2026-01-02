@@ -63,7 +63,6 @@ class SetupCommand extends Command
         ];
     }
 
-
     protected function setupEnvFile(): void
     {
         if (!File::exists(base_path('.env'))) {
