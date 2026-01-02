@@ -8,22 +8,21 @@
         "starter-kit",
         "cms"
     ],
-    "homepage": "https://github.com/gogilo2003/website-starter-kit",
     "authors": [
         {
             "name": "George Ogilo",
             "email": "gogilo2003@gmail.com"
         }
     ],
-    "minimum-stability": "stable",
-    "prefer-stable": true,
     "scripts": {
         "setup": [
             "composer install --working-dir=laravel",
             "@php laravel/artisan key:generate",
-            "@php laravel/artisan migrate --force",
-            "npm --prefix laravel install",
-            "npm --prefix laravel run build"
+            "npm --prefix laravel install"
+        ],
+        "dev": [
+            "Composer\\Config::disableProcessTimeout",
+            "npx concurrently \"php laravel/artisan serve\" \"npm --prefix laravel run dev\""
         ]
     }
 }
