@@ -1,0 +1,10 @@
+{
+    "name": "gogilo2003/website-starter-kit",
+    "version": "1.0.0",
+    "description": "Website Starter Kit for laravel with Custom cms",
+    "keywords": [
+        "laravel",
+        "starter-kit"
+    ],
+    "homepage": "https://github.com/gogilo2003/website-starter-kit"
+}
