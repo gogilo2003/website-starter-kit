@@ -115,6 +115,7 @@ return [
         'name' => env('MAIL_FROM_NAME', 'Example'),
     ],
 
-    'quote_recipient' => env('QUOTE_RECIPIENT', 'quote@youngolive.co.ke'),
+    'quote_recipient' => env('QUOTE_RECIPIENT'),
+    'feedback_email' => env('FEEDBACK_EMAIL'),
 
 ];

@@ -34,7 +34,15 @@ Website Starter Kit for laravel with Custom cms
     ```bash
     php artisan migrate
     ```
+## Configure emails
 
+```dotenv
+# For quotation management flow
+QUOTE_RECIPIENT=
+
+# Feedback Email
+FEEDBACK_EMAIL=
+```
 ## Usage
 To start the development server, run:
 ```bash
