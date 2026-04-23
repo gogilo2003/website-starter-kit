@@ -1,0 +1,22 @@
+# Laravel 13 Upgrade TODO
+
+- [ ] Backup current `laravel/` and `public_html/` folders
+- [ ] Scaffold a fresh Laravel 13 app in a temporary directory
+- [ ] Prepare dependency migration:
+  - [ ] Replace `laravel/breeze` with `gogilo/breez`
+  - [ ] Keep/adjust existing backend packages for Laravel 13 compatibility
+  - [ ] Keep/adjust frontend packages (Vue/Inertia/Vite/TS/Tailwind stack)
+- [ ] Merge Laravel 13 core structure while preserving project architecture:
+  - [ ] Preserve repository pattern wiring (`RepositoryServiceProvider`, `bootstrap/providers.php`)
+  - [ ] Merge `bootstrap/app.php`, `config/*`, and build configs
+- [ ] Reapply project code into upgraded Laravel base:
+  - [ ] `app/`, `routes/`, `resources/`, `database/migrations`, `database/seeders`
+- [ ] Rebuild `public_html/` from fresh Laravel `public/` and patch `public_html/index.php` paths
+- [ ] Install dependencies and run validation checks:
+  - [ ] `composer update/install`
+  - [ ] `npm install`
+  - [ ] `npm run build`
+  - [ ] `php artisan optimize:clear`
+  - [ ] `php artisan route:list`
+  - [ ] `php artisan test`
+- [ ] Summarize results and any follow-up manual steps (excluding `.env`, handled by user)

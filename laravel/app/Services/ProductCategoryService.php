@@ -3,17 +3,17 @@
 namespace App\Services;
 
 use App\Interfaces\Repositories\ProductCategoryRepositoryInterface;
+use App\Models\ProductCategory;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
-use App\Models\ProductCategory;
 
 class ProductCategoryService
 {
-    protected \App\Repositories\Eloquent\ProductCategoryRepository $productCategoryRepository;
+    protected ProductCategoryRepositoryInterface $productCategoryRepository;
 
-    public function __construct()
+    public function __construct(ProductCategoryRepositoryInterface $productCategoryRepository)
     {
-        $this->productCategoryRepository = app()->make(\App\Repositories\Eloquent\ProductCategoryRepository::class);
+        $this->productCategoryRepository = $productCategoryRepository;
     }
 
     /**
