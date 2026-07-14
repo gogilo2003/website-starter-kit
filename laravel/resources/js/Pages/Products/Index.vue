@@ -4,9 +4,9 @@ import ProductCard from '@/Components/Web/ProductCard.vue';
 import { iProduct, iProductCategory, iProducts } from '@/interfaces';
 import { router } from '@inertiajs/vue3';
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
-import Container from '../Components/Container.vue';
-import WebHeader from '../Layouts/WebHeader.vue';
-import WebLayout from '../Layouts/WebLayout.vue';
+import Container from '@/Components/Container.vue';
+import WebHeader from '@/Layouts/WebHeader.vue';
+import WebLayout from '@/Layouts/WebLayout.vue';
 
 const props = defineProps<{
     products: iProducts;
