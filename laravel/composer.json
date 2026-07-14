@@ -13,6 +13,7 @@
         "barryvdh/laravel-dompdf": "^3.1",
         "gogilo/breeze": "*",
         "gogilo/downloads": "@dev",
+        "gogilo/menu": "@dev",
         "inertiajs/inertia-laravel": "^2.0",
         "laravel/framework": "^13.0",
         "laravel/sanctum": "^4.0",
@@ -84,6 +85,13 @@
         {
             "type": "path",
             "url": "packages/gogilo/downloads",
+            "options": {
+                "symlink": true
+            }
+        },
+        {
+            "type": "path",
+            "url": "packages/gogilo/menu",
             "options": {
                 "symlink": true
             }

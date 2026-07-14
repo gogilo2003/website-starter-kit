@@ -16,8 +16,8 @@ export type PageProps<
     };
     ziggy: Config & { location: string };
     menu: {
-        products: any[];
-        resources: any[];
+        admin: Record<string, any>[];
+        public: Record<string, any>[];
     };
     contact: {
         phone: string;

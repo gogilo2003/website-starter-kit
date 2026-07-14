@@ -3,11 +3,10 @@
 namespace App\Http\Middleware;
 
 use App\Models\Element;
+use Gogilo\Menu\MenuRegistry;
+use Illuminate\Http\Request;
 use Inertia\Middleware;
 use Tighten\Ziggy\Ziggy;
-use Illuminate\Http\Request;
-use App\Models\DownloadCategory;
-use App\Services\ProductCategoryService;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -38,7 +37,7 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $request->user(),
             ],
-            'ziggy' => fn() => [
+            'ziggy' => fn () => [
                 ...(new Ziggy)->toArray(),
                 'location' => $request->url(),
             ],
@@ -66,29 +65,14 @@ class HandleInertiaRequests extends Middleware
                 'warning' => $request->session()->get('warning'),
             ];
         }
-        if (!empty($notification)) {
+        if (! empty($notification)) {
             $props['notification'] = $notification;
         }
 
         $intro = ($item = Element::where('name', 'welcome')->where('published', 1)->first()) ? $item->content : null;
         $props['intro'] = $intro;
 
-        $menu = [];
-
-        $products = app()->make(ProductCategoryService::class)->getAllProductCategories(['filters' => ['published' => 1]], true);
-
-        $resources = DownloadCategory::all()
-            ->map(fn($item) => [
-                "name" => $item->name,
-                "slug" => $item->slug,
-                "caption" => $item->name,
-                "description" => $item->description,
-            ]);
-
-        $menu['products'] = $products;
-        $menu['resources'] = $resources;
-
-        $props['menu'] = $menu;
+        $props['menu'] = app(MenuRegistry::class)->resolveAll();
 
         $socialmedia = Element::where('published', 1)
             ->whereIn(
@@ -98,16 +82,16 @@ class HandleInertiaRequests extends Middleware
                     'twitter',
                     'linkedin',
                     'instagram',
-                    'youtube'
+                    'youtube',
                 ]
             )
             ->orderBy('name', 'DESC')
             ->get()
             ->map(
-                fn($item) => [
-                    "url" => $item->content,
-                    "icon" => $item->icon,
-                    "title" => $item->title,
+                fn ($item) => [
+                    'url' => $item->content,
+                    'icon' => $item->icon,
+                    'title' => $item->title,
                 ]
             );
 

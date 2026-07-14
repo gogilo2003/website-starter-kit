@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "96618d7c9ca51488fcb5b356e1dc9728",
+    "content-hash": "9496a2d1c7ba63bc220f1bd3db5ba025",
     "packages": [
         {
             "name": "barryvdh/laravel-dompdf",
@@ -923,6 +923,46 @@
                 "s3",
                 "secure"
             ],
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
+            "name": "gogilo/menu",
+            "version": "dev-main",
+            "dist": {
+                "type": "path",
+                "url": "packages/gogilo/menu",
+                "reference": "987ad74adca792aabc8e80a8680ca103bc88717c"
+            },
+            "require": {
+                "illuminate/support": "^13.0",
+                "php": "^8.3"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Gogilo\\Menu\\MenuServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Gogilo\\Menu\\": "src/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Gogilo Team",
+                    "email": "team@gogilo.com"
+                }
+            ],
+            "description": "Centralized menu registry for the Laravel starter kit. Packages register admin and public menu items; the host exposes them as the single source of truth.",
             "transport-options": {
                 "symlink": true,
                 "relative": true
@@ -10792,13 +10832,14 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "gogilo/downloads": 20
+        "gogilo/downloads": 20,
+        "gogilo/menu": 20
     },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
         "php": "^8.3"
     },
-    "platform-dev": {},
-    "plugin-api-version": "2.9.0"
+    "platform-dev": [],
+    "plugin-api-version": "2.6.0"
 }
