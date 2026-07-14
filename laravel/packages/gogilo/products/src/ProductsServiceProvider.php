@@ -2,78 +2,66 @@
 
 namespace Gogilo\Products;
 
+use Gogilo\Menu\MenuItem;
+use Gogilo\Menu\MenuRegistry;
+use Gogilo\Products\Repositories\BrandRepository;
+use Gogilo\Products\Repositories\BrandRepositoryInterface;
+use Gogilo\Products\Repositories\ProductCategoryRepository;
+use Gogilo\Products\Repositories\ProductCategoryRepositoryInterface;
+use Gogilo\Products\Repositories\ProductRepository;
+use Gogilo\Products\Repositories\ProductRepositoryInterface;
+use Gogilo\Products\Services\ProductCategoryService;
 use Illuminate\Support\ServiceProvider;
-use Gogilo\Products\Console\InstallProductsCommand;
 
 class ProductsServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        //
+        $this->app->bind(ProductRepositoryInterface::class, ProductRepository::class);
+        $this->app->bind(ProductCategoryRepositoryInterface::class, ProductCategoryRepository::class);
+        $this->app->bind(BrandRepositoryInterface::class, BrandRepository::class);
     }
 
     public function boot(): void
     {
-        $basePath = dirname(__DIR__);
+        $this->loadMigrationsFrom(__DIR__.'/Database/Migrations');
+        $this->loadRoutesFrom(__DIR__.'/Routes/products.php');
 
-        $this->publishes([
-            $basePath . '/stubs/config/products.php' => config_path('products.php'),
-        ], 'products-config');
+        $this->registerMenu();
+    }
 
-        $this->publishes([
-            $basePath . '/stubs/routes/products.php' => base_path('routes/products.php'),
-        ], 'products-routes');
-
-        $this->publishes([
-            $basePath . '/stubs/app/Interfaces/Repositories/ProductRepositoryInterface.php' => app_path('Interfaces/Repositories/ProductRepositoryInterface.php'),
-            $basePath . '/stubs/app/Repositories/ProductRepository.php' => app_path('Repositories/ProductRepository.php'),
-            $basePath . '/stubs/app/Http/Controllers/ProductController.php' => app_path('Http/Controllers/ProductController.php'),
-            $basePath . '/stubs/app/Models/Product.php' => app_path('Models/Product.php'),
-        ], 'products-backend');
-
-        $this->publishes([
-            $basePath . '/stubs/database/migrations/2024_01_31_001129_create_products_table.php' => database_path('migrations/2024_01_31_001129_create_products_table.php'),
-            $basePath . '/stubs/database/migrations/2025_10_28_040329_create_product_categories_table.php' => database_path('migrations/2025_10_28_040329_create_product_categories_table.php'),
-            $basePath . '/stubs/database/migrations/2025_11_03_225339_alter_products_table_add_price_and_attributes_fields.php' => database_path('migrations/2025_11_03_225339_alter_products_table_add_price_and_attributes_fields.php'),
-            $basePath . '/stubs/database/migrations/2025_11_12_005428_add_brand_id_to_products_table.php' => database_path('migrations/2025_11_12_005428_add_brand_id_to_products_table.php'),
-        ], 'products-migrations');
-
-        $this->publishes([
-            $basePath . '/stubs/database/seeders/ProductCategorySeeder.php' => database_path('seeders/ProductCategorySeeder.php'),
-            $basePath . '/stubs/database/seeders/ProductsDatabaseSeeder.php' => database_path('seeders/ProductsDatabaseSeeder.php'),
-        ], 'products-seeders');
-
-        $this->publishes([
-            $basePath . '/stubs/resources/js/interfaces.ts' => resource_path('js/interfaces.ts'),
-            $basePath . '/stubs/resources/js/Pages/Products/Index.vue' => resource_path('js/Pages/Products/Index.vue'),
-            $basePath . '/stubs/resources/js/Pages/Product.vue' => resource_path('js/Pages/Product.vue'),
-            $basePath . '/stubs/resources/js/Pages/Dashboard/Products/Categories.vue' => resource_path('js/Dashboard/Products/Categories.vue'),
-            $basePath . '/stubs/resources/js/Pages/Dashboard/Products/Index.vue' => resource_path('js/Dashboard/Products/Index.vue'),
-            $basePath . '/stubs/resources/js/Components/Products/ProductCard.vue' => resource_path('js/Components/Products/ProductCard.vue'),
-            $basePath . '/stubs/resources/js/Components/Products/ProductCategoryCard.vue' => resource_path('js/Components/Products/ProductCategoryCard.vue'),
-        ], 'products-vue');
-
-        $this->publishes([
-            $basePath . '/stubs/config/products.php' => config_path('products.php'),
-            $basePath . '/stubs/routes/products.php' => base_path('routes/products.php'),
-            $basePath . '/stubs/app/Interfaces/Repositories/ProductRepositoryInterface.php' => app_path('Interfaces/Repositories/ProductRepositoryInterface.php'),
-            $basePath . '/stubs/app/Repositories/ProductRepository.php' => app_path('Repositories/ProductRepository.php'),
-            $basePath . '/stubs/app/Http/Controllers/ProductController.php' => app_path('Http/Controllers/ProductController.php'),
-            $basePath . '/stubs/app/Models/Product.php' => app_path('Models/Product.php'),
-            $basePath . '/stubs/database/migrations/2024_01_31_001129_create_products_table.php' => database_path('migrations/2024_01_31_001129_create_products_table.php'),
-            $basePath . '/stubs/database/migrations/2025_10_28_040329_create_product_categories_table.php' => database_path('migrations/2025_10_28_040329_create_product_categories_table.php'),
-            $basePath . '/stubs/database/migrations/2025_11_03_225339_alter_products_table_add_price_and_attributes_fields.php' => database_path('migrations/2025_11_03_225339_alter_products_table_add_price_and_attributes_fields.php'),
-            $basePath . '/stubs/database/migrations/2025_11_12_005428_add_brand_id_to_products_table.php' => database_path('migrations/2025_11_12_005428_add_brand_id_to_products_table.php'),
-            $basePath . '/stubs/database/seeders/ProductCategorySeeder.php' => database_path('seeders/ProductCategorySeeder.php'),
-            $basePath . '/stubs/database/seeders/ProductsDatabaseSeeder.php' => database_path('seeders/ProductsDatabaseSeeder.php'),
-            $basePath . '/stubs/resources/js/Pages/Products/Index.vue' => resource_path('js/Pages/Products/Index.vue'),
-            $basePath . '/stubs/resources/js/Components/Products/ProductCard.vue' => resource_path('js/Components/Products/ProductCard.vue'),
-        ], 'products-package');
-
-        if ($this->app->runningInConsole()) {
-            $this->commands([
-                InstallProductsCommand::class,
-            ]);
+    protected function registerMenu(): void
+    {
+        if (! $this->app->bound(MenuRegistry::class)) {
+            return;
         }
+
+        $registry = $this->app->make(MenuRegistry::class);
+
+        $registry->register('admin', new MenuItem(
+            name: 'dashboard-products-categories',
+            caption: 'Products',
+            icon: 'product',
+            route: 'dashboard-products-categories',
+            altNames: ['dashboard-products'],
+            order: 70,
+        ));
+
+        $registry->register('admin', new MenuItem(
+            name: 'dashboard-brands',
+            caption: 'Brands',
+            icon: 'rectangle-group',
+            route: 'dashboard-brands',
+            order: 60,
+        ));
+
+        $registry->register('public', new MenuItem(
+            name: 'products',
+            caption: 'Products',
+            route: 'products',
+            order: 30,
+            children: fn () => app(ProductCategoryService::class)
+                ->getAllProductCategories(['filters' => ['published' => 1]], true),
+        ));
     }
 }

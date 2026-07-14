@@ -14,6 +14,7 @@
         "gogilo/breeze": "*",
         "gogilo/downloads": "@dev",
         "gogilo/menu": "@dev",
+        "gogilo/products": "@dev",
         "inertiajs/inertia-laravel": "^2.0",
         "laravel/framework": "^13.0",
         "laravel/sanctum": "^4.0",
@@ -92,6 +93,13 @@
         {
             "type": "path",
             "url": "packages/gogilo/menu",
+            "options": {
+                "symlink": true
+            }
+        },
+        {
+            "type": "path",
+            "url": "packages/gogilo/products",
             "options": {
                 "symlink": true
             }

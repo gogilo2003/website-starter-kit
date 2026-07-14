@@ -2,11 +2,12 @@
 
 namespace App\Models;
 
-use Illuminate\Support\Str;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Gogilo\Products\Models\Product;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Str;
 
 class Quote extends Model
 {
@@ -21,7 +22,7 @@ class Quote extends Model
         'message',
         'status',
         'view_count',
-        'last_viewed_at'
+        'last_viewed_at',
     ];
 
     protected $casts = [
@@ -50,7 +51,7 @@ class Quote extends Model
     {
         do {
             // You can customize the format as needed
-            $code = 'Q-' . strtoupper(Str::random(6));
+            $code = 'Q-'.strtoupper(Str::random(6));
         } while (static::where('code', $code)->exists());
 
         return $code;
@@ -77,8 +78,6 @@ class Quote extends Model
 
     /**
      * Get all of the items for the Quote
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function items(): HasMany
     {
@@ -101,7 +100,7 @@ class Quote extends Model
     public function getTotalAmountAttribute(): float
     {
         return $this->items->sum(function ($item) {
-            return $item->quantity *  $item->price;
+            return $item->quantity * $item->price;
         });
     }
 

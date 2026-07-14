@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "9496a2d1c7ba63bc220f1bd3db5ba025",
+    "content-hash": "2abb51cbce20f686d3ca87e6c31a6f9b",
     "packages": [
         {
             "name": "barryvdh/laravel-dompdf",
@@ -877,9 +877,10 @@
             "dist": {
                 "type": "path",
                 "url": "packages/gogilo/downloads",
-                "reference": "817d56a8dbbc38a29ccc4039abed567c48c787b7"
+                "reference": "fe49ae88dd3d41655ddc410c2b68bd0234709b77"
             },
             "require": {
+                "gogilo/menu": "*",
                 "illuminate/database": "^10.0|^11.0|^12.0|^13.0",
                 "illuminate/filesystem": "^10.0|^11.0|^12.0|^13.0",
                 "illuminate/http": "^10.0|^11.0|^12.0|^13.0",
@@ -963,6 +964,41 @@
                 }
             ],
             "description": "Centralized menu registry for the Laravel starter kit. Packages register admin and public menu items; the host exposes them as the single source of truth.",
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
+            "name": "gogilo/products",
+            "version": "dev-main",
+            "dist": {
+                "type": "path",
+                "url": "packages/gogilo/products",
+                "reference": "9979f357ae8e38a5a1db394cc18d604894f5f4a9"
+            },
+            "require": {
+                "gogilo/menu": "*",
+                "illuminate/support": "^13.0",
+                "php": "^8.3"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Gogilo\\Products\\ProductsServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Gogilo\\Products\\": "src/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "description": "Products content-type package for Laravel starter kit.",
             "transport-options": {
                 "symlink": true,
                 "relative": true
@@ -10833,7 +10869,8 @@
     "minimum-stability": "stable",
     "stability-flags": {
         "gogilo/downloads": 20,
-        "gogilo/menu": 20
+        "gogilo/menu": 20,
+        "gogilo/products": 20
     },
     "prefer-stable": true,
     "prefer-lowest": false,

@@ -2,43 +2,43 @@
 
 namespace App\Repositories;
 
-use App\Models\Quote;
-use App\Models\Product;
-use App\Util\PdfGenerator;
-use App\Models\QuoteProduct;
+use App\Interfaces\Repositories\QuoteRepositoryInterface;
 use App\Mail\QuoteStatusUpdate;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Mail;
+use App\Models\Quote;
+use App\Models\QuoteProduct;
+use App\Util\PdfGenerator;
+use Gogilo\Products\Models\Product;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Collection as SupportCollection;
-use App\Interfaces\Repositories\QuoteRepositoryInterface;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 
 class QuoteRepository implements QuoteRepositoryInterface
 {
     public function getAllQuotes(array $params = []): LengthAwarePaginator|Collection|SupportCollection
     {
-        $filters = !empty($params['filters']) ? $params['filters'] : [];
+        $filters = ! empty($params['filters']) ? $params['filters'] : [];
 
         $query = Quote::query();
 
-        if (!empty($params['relations'])) {
+        if (! empty($params['relations'])) {
             $query->with($params['relations'])
                 ->orderBy('created_at', 'desc');
         }
-        if (!empty($filters['status'])) {
+        if (! empty($filters['status'])) {
             $query->where('status', $filters['status']);
         }
 
-        if (!empty($filters['date_from'])) {
+        if (! empty($filters['date_from'])) {
             $query->whereDate('created_at', '>=', $filters['date_from']);
         }
 
-        if (!empty($filters['date_to'])) {
+        if (! empty($filters['date_to'])) {
             $query->whereDate('created_at', '<=', $filters['date_to']);
         }
 
-        if (!empty($filters['search'])) {
+        if (! empty($filters['search'])) {
             $search = $filters['search'];
             $query->where(function ($q) use ($search) {
                 $q->where('code', 'like', "%{$search}%")
@@ -48,16 +48,18 @@ class QuoteRepository implements QuoteRepositoryInterface
             });
         }
 
-        $paginate = !empty($params['paginate']) && $params['paginate'];
-        $perPage = !empty($params['per_page']) ? $params['per_page'] : 10;
-        $mapped = !empty($params['mapped']) && $params['mapped'];
+        $paginate = ! empty($params['paginate']) && $params['paginate'];
+        $perPage = ! empty($params['per_page']) ? $params['per_page'] : 10;
+        $mapped = ! empty($params['mapped']) && $params['mapped'];
         $res = null;
         if ($paginate) {
             $res = $query->paginate($perPage);
-            return $mapped ? $res->through(fn(Quote $quote) => $this->mapQuote($quote)) : $res;
+
+            return $mapped ? $res->through(fn (Quote $quote) => $this->mapQuote($quote)) : $res;
         }
         $res = $query->get();
-        return $mapped ? $res->through(fn(Quote $quote) => $this->mapQuote($quote)) : $res;
+
+        return $mapped ? $res->through(fn (Quote $quote) => $this->mapQuote($quote)) : $res;
     }
 
     public function getQuoteById(int $id): ?Quote
@@ -95,7 +97,7 @@ class QuoteRepository implements QuoteRepositoryInterface
                 'status' => $data['status'] ?? 'pending',
             ]);
 
-            if (!empty($data['products'])) {
+            if (! empty($data['products'])) {
                 $this->attachProducts($quote->id, $data['products']);
             }
 
@@ -107,7 +109,7 @@ class QuoteRepository implements QuoteRepositoryInterface
     {
         $quote = $this->getQuoteById($id);
 
-        if (!$quote) {
+        if (! $quote) {
             return false;
         }
 
@@ -121,7 +123,7 @@ class QuoteRepository implements QuoteRepositoryInterface
                 'status' => $data['status'] ?? $quote->status,
             ]);
 
-            if ($updated && !empty($data['products'])) {
+            if ($updated && ! empty($data['products'])) {
                 $this->syncProducts($quote->id, $data['products']);
             }
 
@@ -135,6 +137,7 @@ class QuoteRepository implements QuoteRepositoryInterface
         $item->quantity = $data['quantity'] ?? $item->quantity;
         $item->price = $data['price'] ?? $item->price;
         $item->notes = $data['notes'] ?? $item->notes;
+
         return $item->save();
     }
 
@@ -142,12 +145,13 @@ class QuoteRepository implements QuoteRepositoryInterface
     {
         $quote = $this->getQuoteById($id);
 
-        if (!$quote) {
+        if (! $quote) {
             return false;
         }
 
         return DB::transaction(function () use ($quote) {
             $quote->products()->detach();
+
             return $quote->delete();
         });
     }
@@ -225,7 +229,7 @@ class QuoteRepository implements QuoteRepositoryInterface
                     ->orWhere('phone', 'like', "%{$search}%");
             });
 
-        if (!empty($filters['status'])) {
+        if (! empty($filters['status'])) {
             $query->where('status', $filters['status']);
         }
 
@@ -236,7 +240,7 @@ class QuoteRepository implements QuoteRepositoryInterface
     {
         $quote = $this->getQuoteById($id);
 
-        if (!$quote) {
+        if (! $quote) {
             return false;
         }
 
@@ -257,7 +261,7 @@ class QuoteRepository implements QuoteRepositoryInterface
     {
         $quote = $this->getQuoteById($id);
 
-        if (!$quote) {
+        if (! $quote) {
             return false;
         }
 
@@ -271,6 +275,7 @@ class QuoteRepository implements QuoteRepositoryInterface
     {
         $quote = $this->getQuoteById($id);
         $quote->last_viewed_at = now();
+
         return $quote->save();
     }
 
@@ -278,70 +283,71 @@ class QuoteRepository implements QuoteRepositoryInterface
     {
         // return $quote;
         $data = [
-            "id" => $quote->id,
-            "code" => $quote->code,
-            "name" => $quote->name,
-            "email" => $quote->email,
-            "phone" => $quote->phone,
-            "company" => $quote->company,
-            "message" => $quote->message,
-            "status" => $quote->status,
-            "view_count" => $quote->view_count,
-            "last_viewed_at" => $quote->last_viewed_at,
-            "total_amount" => $quote->total_amount,
-            "created_at" => $quote->created_at,
-            "updated_at" => $quote->updated_at,
-            "deleted_at" => $quote->deleted_at,
-            "quote_path" => $quote->quote_path,
+            'id' => $quote->id,
+            'code' => $quote->code,
+            'name' => $quote->name,
+            'email' => $quote->email,
+            'phone' => $quote->phone,
+            'company' => $quote->company,
+            'message' => $quote->message,
+            'status' => $quote->status,
+            'view_count' => $quote->view_count,
+            'last_viewed_at' => $quote->last_viewed_at,
+            'total_amount' => $quote->total_amount,
+            'created_at' => $quote->created_at,
+            'updated_at' => $quote->updated_at,
+            'deleted_at' => $quote->deleted_at,
+            'quote_path' => $quote->quote_path,
         ];
 
         if ($quote->relationLoaded('items')) {
-            $data["items"] = $quote->items->map(function (QuoteProduct $item) use ($object) {
+            $data['items'] = $quote->items->map(function (QuoteProduct $item) use ($object) {
                 $arrayItem = [
-                    "id" => $item->id,
-                    "quote_id" => $item->quote_id,
-                    "product_id" => $item->product_id,
-                    "price" => $item->price,
-                    "quantity" => $item->quantity,
-                    "notes" => $item->notes,
-                    "created_at" => $item->created_at,
-                    "updated_at" => $item->updated_at,
+                    'id' => $item->id,
+                    'quote_id' => $item->quote_id,
+                    'product_id' => $item->product_id,
+                    'price' => $item->price,
+                    'quantity' => $item->quantity,
+                    'notes' => $item->notes,
+                    'created_at' => $item->created_at,
+                    'updated_at' => $item->updated_at,
                 ];
                 if ($item->relationLoaded('product')) {
-                    $arrayItem["product"] = $this->mapProduct($item->product);
+                    $arrayItem['product'] = $this->mapProduct($item->product);
                 }
+
                 return $object ? (object) $arrayItem : $arrayItem;
             });
         }
-        if (!$object) {
+        if (! $object) {
             return $data;
         }
 
-        return (object)$data;
+        return (object) $data;
     }
 
     protected function mapProduct(Product $product, bool $object = false)
     {
         $data = [
-            "id" => $product->id,
-            "title" => $product->title,
-            "slug" => $product->slug,
-            "summary" => $product->summary,
-            "content" => $product->content,
-            "price" => $product->price,
-            "features" => $product->features,
-            "product_category_id" => $product->product_category_id,
-            "brand_id" => $product->brand_id,
-            "published" => $product->published,
-            "front" => $product->front,
-            "created_at" => $product->created_at,
-            "updated_at" => $product->updated_at,
-            "picture" => $product->picture,
+            'id' => $product->id,
+            'title' => $product->title,
+            'slug' => $product->slug,
+            'summary' => $product->summary,
+            'content' => $product->content,
+            'price' => $product->price,
+            'features' => $product->features,
+            'product_category_id' => $product->product_category_id,
+            'brand_id' => $product->brand_id,
+            'published' => $product->published,
+            'front' => $product->front,
+            'created_at' => $product->created_at,
+            'updated_at' => $product->updated_at,
+            'picture' => $product->picture,
         ];
-        if (!$object) {
+        if (! $object) {
             return $data;
         }
 
-        return (object)$data;
+        return (object) $data;
     }
 }

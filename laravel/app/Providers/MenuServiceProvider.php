@@ -2,7 +2,6 @@
 
 namespace App\Providers;
 
-use App\Services\ProductCategoryService;
 use Gogilo\Menu\MenuItem;
 use Gogilo\Menu\MenuRegistry;
 use Illuminate\Support\ServiceProvider;
@@ -54,21 +53,6 @@ class MenuServiceProvider extends ServiceProvider
                 order: 50,
             ),
             new MenuItem(
-                name: 'dashboard-brands',
-                caption: 'Brands',
-                icon: 'rectangle-group',
-                route: 'dashboard-brands',
-                order: 60,
-            ),
-            new MenuItem(
-                name: 'dashboard-products-categories',
-                caption: 'Products',
-                icon: 'product',
-                route: 'dashboard-products-categories',
-                altNames: ['dashboard-products'],
-                order: 70,
-            ),
-            new MenuItem(
                 name: 'dashboard-partners',
                 caption: 'Partners',
                 icon: 'partners',
@@ -99,14 +83,6 @@ class MenuServiceProvider extends ServiceProvider
                 caption: 'About Us',
                 route: 'about',
                 order: 20,
-            ),
-            new MenuItem(
-                name: 'products',
-                caption: 'Products',
-                route: 'products',
-                order: 30,
-                children: fn () => app(ProductCategoryService::class)
-                    ->getAllProductCategories(['filters' => ['published' => 1]], true),
             ),
             new MenuItem(
                 name: 'contact',

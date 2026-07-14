@@ -2,8 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Relations\Pivot;
+use Gogilo\Products\Models\Product;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\Pivot;
 
 class QuoteProduct extends Pivot
 {
@@ -25,8 +26,6 @@ class QuoteProduct extends Pivot
 
     /**
      * Get the quote that owns the QuoteProduct
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function quote(): BelongsTo
     {
@@ -35,8 +34,6 @@ class QuoteProduct extends Pivot
 
     /**
      * Get the product that owns the QuoteProduct
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function product(): BelongsTo
     {
