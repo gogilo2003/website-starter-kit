@@ -2,60 +2,61 @@
 
 namespace Gogilo\Downloads;
 
+use Gogilo\Downloads\Models\DownloadCategory;
+use Gogilo\Downloads\Repositories\DownloadCategoryRepository;
+use Gogilo\Downloads\Repositories\DownloadCategoryRepositoryInterface;
+use Gogilo\Downloads\Repositories\DownloadRepository;
+use Gogilo\Downloads\Repositories\DownloadRepositoryInterface;
+use Gogilo\Menu\MenuItem;
+use Gogilo\Menu\MenuRegistry;
 use Illuminate\Support\ServiceProvider;
 
 class DownloadsServiceProvider extends ServiceProvider
 {
-    /**
-     * Register services.
-     */
     public function register(): void
     {
-        $this->mergeConfigFrom(
-            __DIR__.'/Config/downloads.php',
-            'downloads'
-        );
-
-        $this->app->singleton(DownloadManager::class, function ($app) {
-            return new DownloadManager(
-                $app->make(\Illuminate\Contracts\Filesystem\Factory::class),
-                $app->make('config')->get('downloads', [])
-            );
-        });
-
-        $this->app->alias(DownloadManager::class, 'downloads');
+        $this->app->bind(DownloadRepositoryInterface::class, DownloadRepository::class);
+        $this->app->bind(DownloadCategoryRepositoryInterface::class, DownloadCategoryRepository::class);
     }
 
-    /**
-     * Bootstrap services.
-     */
     public function boot(): void
     {
-        $basePath = __DIR__;
+        $this->loadMigrationsFrom(__DIR__.'/Database/Migrations');
+        $this->loadRoutesFrom(__DIR__.'/Routes/downloads.php');
 
-        // Publish configuration
-        $this->publishes([
-            $basePath . '/Config/downloads.php' => config_path('downloads.php'),
-        ], 'downloads-config');
+        $this->registerMenu();
+    }
 
-        // Register routes
-        if ($this->app->runningInConsole()) {
-            $this->publishes([
-                $basePath . '/Console/stubs/api.php' => base_path('routes/downloads-api.php'),
-                $basePath . '/Console/stubs/web.php' => base_path('routes/downloads-web.php'),
-            ], 'downloads-routes');
+    protected function registerMenu(): void
+    {
+        if (! $this->app->bound(MenuRegistry::class)) {
+            return;
         }
 
-        $this->loadRoutesFrom($basePath . '/Routes/downloads.php');
+        $registry = $this->app->make(MenuRegistry::class);
 
-        // Register middleware
-        $this->app['router']->aliasMiddleware('download.throttle', Middleware\DownloadThrottleMiddleware::class);
-        $this->app['router']->aliasMiddleware('download.permission', Middleware\DownloadPermissionMiddleware::class);
+        $registry->register('admin', new MenuItem(
+            name: 'dashboard-downloads-categories',
+            caption: 'Downloads',
+            icon: 'downloads',
+            route: 'dashboard-downloads-categories',
+            order: 90,
+        ));
 
-        // Register views
-        $this->loadViewsFrom($basePath . '/Resources/views', 'downloads');
-
-        // Register migrations
-        $this->loadMigrationsFrom($basePath . '/Database/Migrations');
+        $registry->register('public', new MenuItem(
+            name: 'downloads',
+            caption: 'Downloads',
+            route: 'downloads',
+            order: 40,
+            children: fn () => DownloadCategory::query()
+                ->get()
+                ->map(fn ($item) => [
+                    'name' => $item->name,
+                    'slug' => $item->slug,
+                    'caption' => $item->name,
+                    'description' => $item->description,
+                ])
+                ->all(),
+        ));
     }
 }

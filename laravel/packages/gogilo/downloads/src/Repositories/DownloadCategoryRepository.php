@@ -1,20 +1,18 @@
 <?php
 
-namespace App\Repositories;
+namespace Gogilo\Downloads\Repositories;
 
-use App\Models\DownloadCategory;
-use App\Interfaces\Repositories\DownloadCategoryRepositoryInterface;
+use Gogilo\Downloads\Models\DownloadCategory;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Collection as SupportCollection;
 
 class DownloadCategoryRepository implements DownloadCategoryRepositoryInterface
 {
-    public function all(array $params = []): array | Collection | SupportCollection | LengthAwarePaginator
+    public function all(array $params = []): array|Collection|SupportCollection|LengthAwarePaginator
     {
         $query = DownloadCategory::query();
 
-        // Handle search
         if (isset($params['search'])) {
             $search = $params['search'];
             $query->where(function ($q) use ($search) {
@@ -23,40 +21,38 @@ class DownloadCategoryRepository implements DownloadCategoryRepositoryInterface
             });
         }
 
-        // Handle eager loading of relations
         if (isset($params['relations']) && is_array($params['relations'])) {
             $query->with($params['relations']);
         }
 
-        // Handle pagination
         if (isset($params['paginate']) && $params['paginate']) {
-            $perPage = $params['per_page'] ?? 10; // Default to 10 items per page
+            $perPage = $params['per_page'] ?? 10;
+
             return $query->paginate($perPage)
-                ->through(fn(DownloadCategory $downloadCategory) => $this->mapCategory($downloadCategory));
+                ->through(fn (DownloadCategory $downloadCategory) => $this->mapCategory($downloadCategory));
         }
 
-        // Return all results without pagination
         return $query->get()
-            ->map(fn(DownloadCategory $downloadCategory) => $this->mapCategory($downloadCategory));
+            ->map(fn (DownloadCategory $downloadCategory) => $this->mapCategory($downloadCategory));
     }
 
     public function find($id, array $relations = [], bool $mapped = false): ?DownloadCategory
     {
         return DownloadCategory::find($id);
     }
-    public function findBySlug(string $slug, array $relations = [], bool $mapped = false): object | array | null
+
+    public function findBySlug(string $slug, array $relations = [], bool $mapped = false): object|array|null
     {
         $query = DownloadCategory::where('slug', $slug);
-
         $query->with($relations);
 
         return $mapped ? $this->mapCategory($query->first()) : $query->first();
     }
 
-    public function create(array $data): DownloadCategory | bool
+    public function create(array $data): DownloadCategory|bool
     {
         try {
-            $category = new DownloadCategory();
+            $category = new DownloadCategory;
             $category->name = $data['name'];
             $category->slug = $data['slug'];
             $category->description = $data['description'] ?? null;
@@ -65,12 +61,11 @@ class DownloadCategoryRepository implements DownloadCategoryRepositoryInterface
 
             return $category;
         } catch (\Exception $e) {
-            // Log the error or handle it as needed
             return false;
         }
     }
 
-    public function update(DownloadCategory $category, array $data): DownloadCategory | bool
+    public function update(DownloadCategory $category, array $data): DownloadCategory|bool
     {
         try {
             $category->name = $data['name'] ?? $category->name;
@@ -81,7 +76,6 @@ class DownloadCategoryRepository implements DownloadCategoryRepositoryInterface
 
             return $category;
         } catch (\Exception $e) {
-            // Log the error or handle it as needed
             return false;
         }
     }
@@ -90,31 +84,34 @@ class DownloadCategoryRepository implements DownloadCategoryRepositoryInterface
     {
         try {
             $category->delete();
+
             return true;
         } catch (\Exception $e) {
-            // Log the error or handle it as needed
             return false;
         }
     }
 
     public function activate(DownloadCategory $category): bool
     {
-        $category->is_active = !$category->is_active;
+        $category->is_active = ! $category->is_active;
         $category->save();
+
         return $category->is_active;
     }
 
     protected function mapCategory(DownloadCategory $downloadCategory)
     {
         $data = [
-            "id" => $downloadCategory->id,
-            "name" => $downloadCategory->name,
-            "slug" => $downloadCategory->slug,
-            "description" => $downloadCategory->description,
+            'id' => $downloadCategory->id,
+            'name' => $downloadCategory->name,
+            'slug' => $downloadCategory->slug,
+            'description' => $downloadCategory->description,
         ];
+
         if ($downloadCategory->relationLoaded('downloads')) {
-            $data["downloads"] = $downloadCategory->downloads;
+            $data['downloads'] = $downloadCategory->downloads;
         }
+
         return (object) $data;
     }
 }

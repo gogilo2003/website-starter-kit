@@ -2,72 +2,74 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Goal;
-use Inertia\Inertia;
-use App\Models\Quote;
-use App\Models\Slide;
-use App\Support\Util;
+use App\Http\Requests\RequestQuoteRequest;
+use App\Http\Requests\SendFeedbackRequest;
+use App\Mail\WebFeedback;
 use App\Models\Element;
+use App\Models\NewsArticle;
+use App\Models\PageSection;
 use App\Models\Partner;
 use App\Models\Picture;
 use App\Models\Product;
-use App\Models\Download;
-use App\Mail\WebFeedback;
-use App\Models\NewsArticle;
-use App\Models\PageSection;
-use Illuminate\Support\Str;
+use App\Models\Slide;
+use App\Services\PageSectionService;
+use App\Services\ProductCategoryService;
 use App\Services\QuoteService;
-use App\Models\ProductCategory;
-use App\Models\DownloadCategory;
-use App\Services\DownloadService;
+use App\Support\Util;
+use Gogilo\Downloads\Models\Download;
+use Gogilo\Downloads\Services\DownloadCategoryService;
+use Gogilo\Downloads\Services\DownloadService;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Mail;
-use App\Services\QuoteRequestService;
 use Illuminate\Support\Facades\Storage;
-use App\Http\Requests\RequestQuoteRequest;
-use App\Http\Requests\SendFeedbackRequest;
+use Inertia\Inertia;
 
 // use Illuminate\Http\Request;
 
 class WebController extends Controller
 {
     protected $pageSectionService;
+
     protected $productCategoryService;
+
     protected $downloadService;
+
     protected QuoteService $quoteService;
 
-    protected \App\Services\DownloadCategoryService $downloadCategoryService;
+    protected DownloadCategoryService $downloadCategoryService;
 
-    function __construct(
-        \App\Services\PageSectionService $pageSectionService,
-        \App\Services\ProductCategoryService $productCategoryService
+    public function __construct(
+        PageSectionService $pageSectionService,
+        ProductCategoryService $productCategoryService
     ) {
         $this->pageSectionService = $pageSectionService;
         $this->productCategoryService = $productCategoryService;
-        $this->downloadCategoryService = app(\App\Services\DownloadCategoryService::class);
+        $this->downloadCategoryService = app(DownloadCategoryService::class);
         $this->downloadService = app(DownloadService::class);
         $this->quoteService = app(QuoteService::class);
     }
-    function home()
+
+    public function home()
     {
         $products = Product::where('published', 1)
             ->where('front', 1)
-            ->orderBy('created_at', 'DESC')->get()->map(fn($item) => [
-                "id" => $item->id,
-                "title" => $item->title,
-                "url" => route('product', $item->slug),
-                "picture" => $item->pictures->count() ? Util::pictureUrl($item->pictures()->first()->name) : null,
-                "summary" => $item->summary
+            ->orderBy('created_at', 'DESC')->get()->map(fn ($item) => [
+                'id' => $item->id,
+                'title' => $item->title,
+                'url' => route('product', $item->slug),
+                'picture' => $item->pictures->count() ? Util::pictureUrl($item->pictures()->first()->name) : null,
+                'summary' => $item->summary,
             ]);
 
         $product_categories = $this->productCategoryService->getAllProductCategories(['filters' => ['published' => 1, 'promoted' => 1]], true);
 
-        $slides = Slide::where('published', 1)->get()->map(fn($item) => [
-            "id" => $item->id,
-            "title" => $item->title ?? config('app.name'),
-            "picture" => Util::pictureUrl($item->picture),
-            "media_type" => $item->media_type,
-            "caption" => $item->caption ?? 'Rooted in Values, Growing with Excellence.',
-            "published" => $item->published,
+        $slides = Slide::where('published', 1)->get()->map(fn ($item) => [
+            'id' => $item->id,
+            'title' => $item->title ?? config('app.name'),
+            'picture' => Util::pictureUrl($item->picture),
+            'media_type' => $item->media_type,
+            'caption' => $item->caption ?? 'Rooted in Values, Growing with Excellence.',
+            'published' => $item->published,
         ]);
 
         $product_intro = ($intro = Element::where('name', 'product-intro')
@@ -75,12 +77,12 @@ class WebController extends Controller
         $project_intro = ($intro = Element::where('name', 'project-intro')
             ->first()) ? $intro->content : '';
 
-        $partners = Partner::where('published', 1)->where('front', 1)->get()->map(fn($item) => [
-            "id" => $item->id,
-            "title" => $item->title,
-            "logo" => Util::pictureUrl($item->logo),
-            "website" => $item->website,
-            "description" => $item->description,
+        $partners = Partner::where('published', 1)->where('front', 1)->get()->map(fn ($item) => [
+            'id' => $item->id,
+            'title' => $item->title,
+            'logo' => Util::pictureUrl($item->logo),
+            'website' => $item->website,
+            'description' => $item->description,
         ]);
 
         $welcome = Element::where('name', 'welcome')->where('published', 1)->first();
@@ -97,6 +99,7 @@ class WebController extends Controller
 
         $customers = $this->pageSectionService->getByPageSectionName('featured-customers', ['elements'], true);
         $categories = $this->productCategoryService->getAllProductCategories(['filters' => ['published' => 1, 'promoted' => 1]], true);
+
         return Inertia::render('Home', [
             'products' => $products,
             'product_categories' => $product_categories,
@@ -107,38 +110,38 @@ class WebController extends Controller
             'customers' => $customers,
             'categories' => $categories,
             'welcome' => [
-                "id" => $welcome->id,
-                "title" => $welcome->title,
-                "content" => $welcome->content,
-                "icon" => $welcome->icon,
-                "photo" => Util::pictureUrl($welcome->photo),
+                'id' => $welcome->id,
+                'title' => $welcome->title,
+                'content' => $welcome->content,
+                'icon' => $welcome->icon,
+                'photo' => Util::pictureUrl($welcome->photo),
             ],
-            "industriesSection" => $industriesSection ? (object)[
-                "id" => $industriesSection->id,
-                "title" => $industriesSection->title,
-                "description" => $industriesSection->description,
-                "elements" => $industriesSection->elements->map(fn(Element $element) => [
-                    "id" => $element->id,
-                    "title" => $element->title,
-                    "content" => $element->content,
-                    "icon" => $element->icon,
-                    "photo" => Util::pictureUrl($element->photo),
-                ])
-            ] : null
+            'industriesSection' => $industriesSection ? (object) [
+                'id' => $industriesSection->id,
+                'title' => $industriesSection->title,
+                'description' => $industriesSection->description,
+                'elements' => $industriesSection->elements->map(fn (Element $element) => [
+                    'id' => $element->id,
+                    'title' => $element->title,
+                    'content' => $element->content,
+                    'icon' => $element->icon,
+                    'photo' => Util::pictureUrl($element->photo),
+                ]),
+            ] : null,
         ]);
     }
 
-    function about()
+    public function about()
     {
         $welcome = Element::where('published', 1)
             ->where('name', 'welcome')->first();
         $welcome = $welcome ? [
-            "id" => $welcome->id,
-            "name" => $welcome->name,
-            "title" => $welcome->title,
-            "content" => $welcome->content,
-            "type" => $welcome->type,
-            "photo" => Util::pictureUrl($welcome->photo),
+            'id' => $welcome->id,
+            'name' => $welcome->name,
+            'title' => $welcome->title,
+            'content' => $welcome->content,
+            'type' => $welcome->type,
+            'photo' => Util::pictureUrl($welcome->photo),
         ] : null;
 
         $numbers = [];
@@ -147,7 +150,7 @@ class WebController extends Controller
             [
                 'elements' => function ($query) {
                     $query->where('published', 1);
-                }
+                },
             ],
             true
         );
@@ -162,21 +165,21 @@ class WebController extends Controller
             ->first();
 
         $whoWeAre = $whoWeAre ? [
-            "id" => $whoWeAre->id,
-            "name" => $whoWeAre->name,
-            "title" => $whoWeAre->title,
-            "content" => $whoWeAre->content,
-            "type" => $whoWeAre->type,
-            "photo" => Util::pictureUrl($whoWeAre->photo),
+            'id' => $whoWeAre->id,
+            'name' => $whoWeAre->name,
+            'title' => $whoWeAre->title,
+            'content' => $whoWeAre->content,
+            'type' => $whoWeAre->type,
+            'photo' => Util::pictureUrl($whoWeAre->photo),
         ] : null;
 
         $partners = [];
-        $partners = Partner::where('published', 1)->get()->map(fn($item) => [
-            "id" => $item->id,
-            "title" => $item->title,
-            "logo" => Util::pictureUrl($item->logo),
-            "website" => $item->website,
-            "description" => $item->description,
+        $partners = Partner::where('published', 1)->get()->map(fn ($item) => [
+            'id' => $item->id,
+            'title' => $item->title,
+            'logo' => Util::pictureUrl($item->logo),
+            'website' => $item->website,
+            'description' => $item->description,
         ]);
 
         $coreValues = [];
@@ -188,6 +191,7 @@ class WebController extends Controller
             }],
             true
         )->elements;
+
         return Inertia::render('About', [
             'welcome' => $welcome,
             'whoWeAre' => $whoWeAre,
@@ -211,28 +215,27 @@ class WebController extends Controller
             ->latest()
             ->limit(6)
             ->get()
-            ->map(fn($item) => [
-                'id'      => $item->id,
-                'title'   => $item->title,
-                'url'     => route('product', $item->slug),
+            ->map(fn ($item) => [
+                'id' => $item->id,
+                'title' => $item->title,
+                'url' => route('product', $item->slug),
                 'picture' => Util::pictureUrl($item->pictures?->first()?->name) ?? url('/images/placeholder-product.png'),
             ]);
 
         return Inertia::render('Product', [
             'product' => [
-                'id'          => $product->id,
-                'title'       => $product->title,
-                'slug'        => $product->slug,
-                'picture'     => Util::pictureUrl($product->pictures?->first()?->name) ?? url('/images/placeholder-product.png'),
-                'pictures'     => $product->pictures,
-                'summary'     => $product->summary,
+                'id' => $product->id,
+                'title' => $product->title,
+                'slug' => $product->slug,
+                'picture' => Util::pictureUrl($product->pictures?->first()?->name) ?? url('/images/placeholder-product.png'),
+                'pictures' => $product->pictures,
+                'summary' => $product->summary,
                 'description' => $product->content,
                 'features' => $product->features,
             ],
             'products' => $otherProducts,
         ]);
     }
-
 
     // public function products(?string $slug = null)
     // {
@@ -275,7 +278,6 @@ class WebController extends Controller
     //     ]);
     // }
 
-
     public function products(?string $slug = null)
     {
         $categories = $this->productCategoryService
@@ -297,7 +299,7 @@ class WebController extends Controller
             $category = $this->productCategoryService
                 ->getProductCategoryBySlug($slug, true);
 
-            if (!$category) {
+            if (! $category) {
                 abort(404);
             }
 
@@ -311,38 +313,39 @@ class WebController extends Controller
         $products = $productsQuery->paginate($perPage)
             ->withPath(request()->path())
             ->withQueryString() // Important: preserves any future filters/search
-            ->through(fn($item) => [
-                'id'      => $item->id,
-                'title'   => $item->title,
-                'slug'    => $item->slug,
-                'url'     => route('product', $item->slug),
+            ->through(fn ($item) => [
+                'id' => $item->id,
+                'title' => $item->title,
+                'slug' => $item->slug,
+                'url' => route('product', $item->slug),
                 'picture' => $item->picture,
                 'summary' => $item->summary,
             ]);
 
         $data = [
-            'products'      => $products,
+            'products' => $products,
             'product_intro' => $product_intro,
-            'category'      => $category,
-            'categories'    => $categories,
+            'category' => $category,
+            'categories' => $categories,
         ];
 
         return Inertia::render('Products', $data);
     }
-    function news($slug = null)
+
+    public function news($slug = null)
     {
         $news_articles = NewsArticle::where('published', 1)
             ->when($slug, function ($query) use ($slug) {
                 $query->where('slug', '<>', $slug);
             })
-            ->orderBy('created_at', 'ASC')->get()->map(fn($item) => [
-                "id" => $item->id,
-                "title" => $item->title,
-                "author" => $item->user->name,
-                "url" => route('news', $item->slug),
-                "picture" => Util::pictureUrl($item->pictures->first()->name),
-                "date" => $item->created_at->toFormattedDateString(),
-                "content" => $item->content,
+            ->orderBy('created_at', 'ASC')->get()->map(fn ($item) => [
+                'id' => $item->id,
+                'title' => $item->title,
+                'author' => $item->user->name,
+                'url' => route('news', $item->slug),
+                'picture' => Util::pictureUrl($item->pictures->first()->name),
+                'date' => $item->created_at->toFormattedDateString(),
+                'content' => $item->content,
             ]);
 
         $intro = Element::where('name', 'article-introduction')->first();
@@ -350,64 +353,68 @@ class WebController extends Controller
 
         if ($slug) {
             $news_article = NewsArticle::where('slug', $slug)->first();
+
             return Inertia::render('NewsArticle', ['news_articles' => $news_articles, 'news_article' => [
-                "id" => $news_article->id,
-                "title" => $news_article->title,
-                "author" => $news_article->user->name,
-                "url" => route('news', $news_article->slug),
-                "picture" => Util::pictureUrl($news_article->pictures->first()->name),
-                "date" => $news_article->created_at->toFormattedDateString(),
-                "content" => $news_article->content
+                'id' => $news_article->id,
+                'title' => $news_article->title,
+                'author' => $news_article->user->name,
+                'url' => route('news', $news_article->slug),
+                'picture' => Util::pictureUrl($news_article->pictures->first()->name),
+                'date' => $news_article->created_at->toFormattedDateString(),
+                'content' => $news_article->content,
             ]]);
         }
+
         return Inertia::render('NewsArticles', ['news_articles' => $news_articles, 'news_article_intro' => $news_article_intro]);
     }
 
-    function contact()
+    public function contact()
     {
         $contacts = Element::where('name', 'phone')
             ->orWhere('name', 'email')
             ->orWhere('name', 'LIKE', '%address%')
-            ->orWhere('name', 'location')->get()->map(fn($item) => (object)[
-                "id" => $item->id,
-                "name" => $item->name,
-                "title" => $item->title,
-                "content" => $item->content,
-                "icon" => $item->icon,
+            ->orWhere('name', 'location')->get()->map(fn ($item) => (object) [
+                'id' => $item->id,
+                'name' => $item->name,
+                'title' => $item->title,
+                'content' => $item->content,
+                'icon' => $item->icon,
             ]);
+
         return Inertia::render('Contact', ['contacts' => $contacts]);
     }
 
-    function feedback(SendFeedbackRequest $request)
+    public function feedback(SendFeedbackRequest $request)
     {
         Mail::to(env('FEEDBACK_EMAIL'))->send(new WebFeedback($request->all()));
+
         return redirect()->back()->with('success', 'Message sent');
     }
 
-    function downloads($slug = null)
+    public function downloads($slug = null)
     {
         if ($slug) {
             $category = $this->downloadCategoryService
-                ->getDownloadCategoryBySlug($slug,  ['downloads'], true);
+                ->getDownloadCategoryBySlug($slug, ['downloads'], true);
 
             return Inertia::render('Downloads', [
-                'downloads' => $category->downloads->map(fn($item) => [
-                    "id" => $item->id,
-                    "title" => $item->title,
-                    "description" => $item->description,
-                    "url" => route('download', $item->slug),
-                    "category" => $item->category->name,
-                    "size" => Util::humanFileSize($item->file_size),
-                    "type" => $item->file_type,
-                    "name" => $item->file_name,
-                    "slug" => $item->slug,
+                'downloads' => $category->downloads->map(fn ($item) => [
+                    'id' => $item->id,
+                    'title' => $item->title,
+                    'description' => $item->description,
+                    'url' => route('download', $item->slug),
+                    'category' => $item->category->name,
+                    'size' => Util::humanFileSize($item->file_size),
+                    'type' => $item->file_type,
+                    'name' => $item->file_name,
+                    'slug' => $item->slug,
                 ]),
                 'category' => function () use ($category) {
-                    return (object)[
-                        "id" => $category->id,
-                        "name" => $category->name,
-                        "slug" => $category->slug,
-                        "description" => $category->description,
+                    return (object) [
+                        'id' => $category->id,
+                        'name' => $category->name,
+                        'slug' => $category->slug,
+                        'description' => $category->description,
                     ];
                 },
             ]);
@@ -417,19 +424,21 @@ class WebController extends Controller
 
         return Inertia::render('Downloads', ['downloads' => $downloads]);
     }
-    function download($slug)
+
+    public function download($slug)
     {
         $download = Download::where('slug', $slug)->first();
-        $file = Storage::path($download->file_path . '/' . $download->file_name);
+        $file = Storage::path($download->file_path.'/'.$download->file_name);
+
         return response()->download($file);
     }
 
-    public function quote(string $code = null)
+    public function quote(?string $code = null)
     {
         $quote = $code ? $this->quoteService->getQuoteByCode($code) : null;
+
         return Inertia::render('Quote/View', ['quote' => $quote]);
     }
-
 
     public function quoteRequest(RequestQuoteRequest $request)
     {
@@ -439,33 +448,34 @@ class WebController extends Controller
 
             // Add products from request if any
             $products = $request->input('products', []);
-            if (!empty($products)) {
+            if (! empty($products)) {
                 $validated['products'] = $products;
             }
 
             $quote = $quoteRequestService->requestQuote($validated);
 
             return redirect()->route('quote-track', $quote->code)
-                ->with('success', 'Your quote request has been submitted successfully. You can track your quote using the code: ' . $quote->code);
+                ->with('success', 'Your quote request has been submitted successfully. You can track your quote using the code: '.$quote->code);
         } catch (\Exception $e) {
             return redirect()->back()
                 ->withInput()
-                ->with('error', 'Failed to submit quote request. Please try again.' . $e->getMessage());
+                ->with('error', 'Failed to submit quote request. Please try again.'.$e->getMessage());
         }
     }
+
     public function quoteTrack(string $code)
     {
         $quote = $this->quoteService->getQuoteByCode(
             $code,
             [
                 'relations' => ['items.product'],
-                'mapped' => true
+                'mapped' => true,
             ]
         );
 
         $this->quoteService->updateLastView($quote->id);
 
-        if (!$quote) {
+        if (! $quote) {
             abort(404, 'Quote not found.');
         }
 
@@ -475,24 +485,24 @@ class WebController extends Controller
         ]);
     }
 
-    public function quoteDownload(string $code): \Illuminate\Http\Response
+    public function quoteDownload(string $code): Response
     {
         $pdfData = $this->quoteService->downloadQuotePdf($code);
 
-        if (!$pdfData) {
+        if (! $pdfData) {
             abort(404, 'Quote not found.');
         }
 
         return response($pdfData['content'])
             ->header('Content-Type', 'application/pdf')
-            ->header('Content-Disposition', 'attachment; filename="' . $pdfData['filename'] . '"');
+            ->header('Content-Disposition', 'attachment; filename="'.$pdfData['filename'].'"');
     }
 
     public function quoteView(string $code)
     {
         $quote = $this->quoteService->getQuoteByCode($code);
 
-        if (!$quote) {
+        if (! $quote) {
             abort(404, 'Quote not found.');
         }
 
@@ -510,6 +520,7 @@ class WebController extends Controller
     {
         return Inertia::render();
     }
+
     public function wishlistRemove()
     {
         return Inertia::render();

@@ -1,16 +1,16 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace Gogilo\Downloads\Http\Controllers;
 
-use App\Http\Requests\StoreDownloadCategoryRequest;
-use App\Http\Requests\UpdateDownloadCategoryRequest;
+use Gogilo\Downloads\Http\Requests\StoreDownloadCategoryRequest;
+use Gogilo\Downloads\Http\Requests\UpdateDownloadCategoryRequest;
+use Gogilo\Downloads\Services\DownloadCategoryService;
 use Illuminate\Http\Request;
-use App\Services\DownloadCategoryService;
 use Inertia\Inertia;
 
-class DownloadCategoryController extends Controller
+class DownloadCategoryController
 {
-    protected $categoryService;
+    protected DownloadCategoryService $categoryService;
 
     public function __construct(DownloadCategoryService $categoryService)
     {
@@ -19,18 +19,15 @@ class DownloadCategoryController extends Controller
 
     public function index(Request $request)
     {
-        // Define parameters for the `all()` method
         $params = [
-            'per_page' => $request->input('per_page', 10), // Default to 10 items per page
-            'search' => $request->input('search', ''), // Search term
-            'paginate' => true, // Always paginate for the index page
-            'relations' => ['downloads']
+            'per_page' => $request->input('per_page', 10),
+            'search' => $request->input('search', ''),
+            'paginate' => true,
+            'relations' => ['downloads'],
         ];
 
-        // Fetch categories using the service
         $categories = $this->categoryService->all($params);
 
-        // Return the Inertia response with categories
         return Inertia::render('Dashboard/Downloads/Categories', [
             'categories' => $categories,
         ]);
@@ -38,8 +35,6 @@ class DownloadCategoryController extends Controller
 
     public function store(StoreDownloadCategoryRequest $request)
     {
-
-        // Create the category using the service
         $category = $this->categoryService->create($request->validated());
 
         if ($category) {
@@ -51,8 +46,6 @@ class DownloadCategoryController extends Controller
 
     public function update(UpdateDownloadCategoryRequest $request, $id)
     {
-
-        // Update the category using the service
         $updatedCategory = $this->categoryService->update($id, $request->all());
 
         if ($updatedCategory) {
@@ -64,7 +57,6 @@ class DownloadCategoryController extends Controller
 
     public function destroy($id)
     {
-        // Delete the category using the service
         $success = $this->categoryService->delete($id);
 
         if ($success) {
@@ -74,9 +66,8 @@ class DownloadCategoryController extends Controller
         return redirect()->back()->with('error', 'Failed to delete category.');
     }
 
-    function activate($id)
+    public function activate($id)
     {
-        // Activate the category using the service
         $category = $this->categoryService->activate($id);
 
         if ($category) {

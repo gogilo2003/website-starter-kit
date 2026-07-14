@@ -2,102 +2,135 @@
 
 namespace Gogilo\Downloads\Http\Controllers;
 
-use Gogilo\Downloads\DownloadManager;
-use Illuminate\Http\JsonResponse;
+use App\Services\FileUploadService;
+use Gogilo\Downloads\Services\DownloadCategoryService;
+use Gogilo\Downloads\Services\DownloadService;
 use Illuminate\Http\Request;
-use Symfony\Component\HttpFoundation\BinaryFileResponse;
-use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Support\Str;
+use Inertia\Inertia;
 
 class DownloadController
 {
-    protected DownloadManager $downloadManager;
+    protected DownloadService $downloadService;
 
-    public function __construct(DownloadManager $downloadManager)
+    protected DownloadCategoryService $categoryService;
+
+    protected FileUploadService $fileUploadService;
+
+    public function __construct(DownloadService $downloadService, DownloadCategoryService $categoryService, FileUploadService $fileUploadService)
     {
-        $this->downloadManager = $downloadManager;
+        $this->downloadService = $downloadService;
+        $this->categoryService = $categoryService;
+        $this->fileUploadService = $fileUploadService;
     }
 
-    /**
-     * Download a file via API.
-     *
-     * @param string $fileId
-     * @param Request $request
-     * @return BinaryFileResponse
-     */
-    public function apiDownload(string $fileId, Request $request): BinaryFileResponse
+    public function index(Request $request, ?int $category_id = null)
     {
-        return $this->downloadManager->download($fileId, $request);
-    }
+        $params = [
+            'per_page' => $request->input('per_page', 10),
+            'search' => $request->input('search', ''),
+            'paginate' => true,
+        ];
 
-    /**
-     * Get file metadata via API.
-     *
-     * @param string $fileId
-     * @return JsonResponse
-     */
-    public function apiMetadata(string $fileId): JsonResponse
-    {
-        try {
-            $metadata = $this->downloadManager->getMetadata($fileId);
-            return response()->json($metadata);
-        } catch (\Exception $e) {
-            return response()->json(['error' => 'File not found'], Response::HTTP_NOT_FOUND);
+        $data = [];
+
+        if ($category_id) {
+            $params['category_id'] = $category_id;
+            $data['category'] = $this->categoryService->find($category_id);
         }
+
+        $data['downloads'] = $this->downloadService->all($params);
+
+        return Inertia::render('Dashboard/Downloads/Index', $data);
     }
 
-    /**
-     * Get file preview URL via API.
-     *
-     * @param string $fileId
-     * @return JsonResponse
-     */
-    public function apiPreview(string $fileId): JsonResponse
+    public function store(Request $request)
     {
-        try {
-            $url = $this->downloadManager->previewUrl($fileId);
-            return response()->json(['url' => $url]);
-        } catch (\Exception $e) {
-            return response()->json(['error' => 'File not found'], Response::HTTP_NOT_FOUND);
+        $data = $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'file' => 'required|file',
+            'category' => 'required|exists:download_categories,id',
+            'is_featured' => 'boolean',
+            'is_active' => 'boolean',
+        ]);
+
+        $data['slug'] = Str::slug($request->title);
+
+        if ($request->hasFile('file')) {
+            $file = $this->fileUploadService->handle($request->file('file'));
+            $data['file_path'] = $file['path'];
+            $data['file_name'] = $file['name'];
+            $data['file_type'] = $file['type'];
+            $data['file_size'] = $file['size'];
         }
+
+        $download = $this->downloadService->create($data);
+
+        if ($download) {
+            return redirect()->back()->with('success', 'Download created successfully.');
+        }
+
+        return redirect()->back()->with('error', 'Failed to create download.');
     }
 
-    /**
-     * Secure download with signed URL verification.
-     *
-     * @param string $fileId
-     * @param Request $request
-     * @return BinaryFileResponse
-     */
-    public function secureDownload(string $fileId, Request $request): BinaryFileResponse
+    public function update(Request $request, $id)
     {
-        // Verify signature
-        $signature = $request->route('signature');
-        $expected = hash_hmac('sha256', $fileId, config('app.key'));
-        
-        if (!hash_equals($expected, $signature)) {
-            abort(403, 'Invalid signature');
+        $request->merge(['id' => $id]);
+
+        $data = $request->validate([
+            'id' => 'required|integer|exists:downloads,id',
+            'title' => 'sometimes|string|max:255',
+            'description' => 'nullable|string',
+            'file' => 'nullable|file',
+            'category' => 'nullable|exists:download_categories,id',
+            'is_featured' => 'boolean',
+            'is_active' => 'boolean',
+        ]);
+
+        $data['slug'] = Str::slug($request->title);
+
+        if ($request->hasFile('file')) {
+            $file = $this->fileUploadService->handle($request->file('file'));
+            $data['file_path'] = $file['path'];
+            $data['file_name'] = $file['name'];
+            $data['file_type'] = $file['type'];
+            $data['file_size'] = $file['size'];
         }
-        
-        // Verify expiry
-        $expires = $request->route('expires');
-        if (time() > $expires) {
-            abort(403, 'URL expired');
+
+        $updatedDownload = $this->downloadService->update($id, $data);
+
+        if ($updatedDownload) {
+            return redirect()->back()->with('success', 'Download updated successfully.');
         }
-        
-        return $this->downloadManager->download($fileId, $request);
+
+        return redirect()->back()->with('error', 'Failed to update download.');
     }
 
-    /**
-     * Preview file in browser.
-     *
-     * @param string $fileId
-     * @return BinaryFileResponse
-     */
-    public function preview(string $fileId): BinaryFileResponse
+    public function destroy($id)
     {
-        $disk = $this->downloadManager->getDisk(config('downloads.preview_disk'));
-        $filePath = $this->downloadManager->getMetadata($fileId)['storage_path'];
-        
-        return $disk->response($filePath, $this->downloadManager->getMetadata($fileId)['original_filename']);
+        $success = $this->downloadService->delete($id);
+
+        if ($success) {
+            return redirect()->back()->with('success', 'Download deleted successfully.');
+        }
+
+        return redirect()->back()->with('error', 'Failed to delete download.');
+    }
+
+    public function activate($id)
+    {
+        $success = $this->downloadService->activate($id);
+        $message = $success ? 'Download activated successfully.' : 'Download deactivated successfully.';
+
+        return redirect()->back()->with('success', $message);
+    }
+
+    public function feature($id)
+    {
+        $success = $this->downloadService->feature($id);
+        $message = $success ? 'Download featured successfully.' : 'Download un-featured successfully.';
+
+        return redirect()->back()->with('success', $message);
     }
 }

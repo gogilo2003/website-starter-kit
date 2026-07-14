@@ -2,7 +2,6 @@
 
 namespace App\Providers;
 
-use App\Models\DownloadCategory;
 use App\Services\ProductCategoryService;
 use Gogilo\Menu\MenuItem;
 use Gogilo\Menu\MenuRegistry;
@@ -77,13 +76,6 @@ class MenuServiceProvider extends ServiceProvider
                 order: 80,
             ),
             new MenuItem(
-                name: 'dashboard-downloads-categories',
-                caption: 'Downloads',
-                icon: 'downloads',
-                route: 'dashboard-downloads-categories',
-                order: 90,
-            ),
-            new MenuItem(
                 name: 'dashboard-migrations',
                 caption: 'Migrations',
                 icon: 'command-line',
@@ -115,21 +107,6 @@ class MenuServiceProvider extends ServiceProvider
                 order: 30,
                 children: fn () => app(ProductCategoryService::class)
                     ->getAllProductCategories(['filters' => ['published' => 1]], true),
-            ),
-            new MenuItem(
-                name: 'downloads',
-                caption: 'Downloads',
-                route: 'downloads',
-                order: 40,
-                children: fn () => DownloadCategory::query()
-                    ->get()
-                    ->map(fn ($item) => [
-                        'name' => $item->name,
-                        'slug' => $item->slug,
-                        'caption' => $item->name,
-                        'description' => $item->description,
-                    ])
-                    ->all(),
             ),
             new MenuItem(
                 name: 'contact',

@@ -1,25 +1,17 @@
 <?php
 
-namespace App\Http\Requests;
+namespace Gogilo\Downloads\Http\Requests;
 
-use Illuminate\Support\Str;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Str;
 
 class StoreDownloadCategoryRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
     public function authorize(): bool
     {
         return true;
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
-     */
     public function rules(): array
     {
         return [
@@ -29,10 +21,7 @@ class StoreDownloadCategoryRequest extends FormRequest
         ];
     }
 
-    /**
-     * prepare for validation
-     */
-    protected function prepareForValidation()
+    protected function prepareForValidation(): void
     {
         $this->merge([
             'slug' => strtolower(Str::slug($this->name)),

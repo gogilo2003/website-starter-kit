@@ -1,23 +1,23 @@
 <?php
 
-namespace App\Services;
+namespace Gogilo\Downloads\Services;
 
-use App\Interfaces\Repositories\DownloadCategoryRepositoryInterface;
-use App\Models\DownloadCategory;
+use Gogilo\Downloads\Models\DownloadCategory;
+use Gogilo\Downloads\Repositories\DownloadCategoryRepositoryInterface;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Collection as SupportCollection;
 
 class DownloadCategoryService
 {
-    protected \App\Repositories\DownloadCategoryRepository $categoryRepository;
+    protected DownloadCategoryRepositoryInterface $categoryRepository;
 
     public function __construct(DownloadCategoryRepositoryInterface $categoryRepository)
     {
         $this->categoryRepository = $categoryRepository;
     }
 
-    public function all(array $params = []): array | Collection | SupportCollection | LengthAwarePaginator
+    public function all(array $params = []): array|Collection|SupportCollection|LengthAwarePaginator
     {
         return $this->categoryRepository->all($params);
     }
@@ -32,16 +32,17 @@ class DownloadCategoryService
         return $this->categoryRepository->find($id);
     }
 
-    public function create(array $data): DownloadCategory | bool
+    public function create(array $data): DownloadCategory|bool
     {
         return $this->categoryRepository->create($data);
     }
 
-    public function update($id, array $data): DownloadCategory | bool
+    public function update($id, array $data): DownloadCategory|bool
     {
         $category = $this->categoryRepository->find($id);
-        if (!$category) {
-            return false; // Category not found
+
+        if (! $category) {
+            return false;
         }
 
         return $this->categoryRepository->update($category, $data);
@@ -50,8 +51,9 @@ class DownloadCategoryService
     public function delete(int $id): bool
     {
         $category = $this->categoryRepository->find($id);
-        if (!$category) {
-            return false; // Category not found
+
+        if (! $category) {
+            return false;
         }
 
         return $this->categoryRepository->delete($category);
@@ -60,8 +62,9 @@ class DownloadCategoryService
     public function activate(int $id): bool
     {
         $category = $this->categoryRepository->find($id);
-        if (!$category) {
-            return false; // Category not found
+
+        if (! $category) {
+            return false;
         }
 
         return $this->categoryRepository->activate($category);

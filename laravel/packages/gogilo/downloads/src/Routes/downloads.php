@@ -1,24 +1,28 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
+use Gogilo\Downloads\Http\Controllers\DownloadCategoryController;
 use Gogilo\Downloads\Http\Controllers\DownloadController;
-use Gogilo\Downloads\Http\Middleware\DownloadPermissionMiddleware;
-use Gogilo\Downloads\Http\Middleware\DownloadThrottleMiddleware;
+use Illuminate\Support\Facades\Route;
 
-// API Routes
-Route::middleware(['api', 'download.throttle'])->prefix('api')->group(function () {
-    Route::get('/downloads/{file}', [DownloadController::class, 'apiDownload'])
-        ->name('downloads.api.download');
-    Route::get('/downloads/{file}/metadata', [DownloadController::class, 'apiMetadata'])
-        ->name('downloads.api.metadata');
-    Route::get('/downloads/{file}/preview', [DownloadController::class, 'apiPreview'])
-        ->name('downloads.api.preview');
-});
+Route::middleware([
+    'auth:sanctum',
+    config('jetstream.auth_session'),
+    'verified',
+])->prefix('dashboard')->name('dashboard')->group(function () {
+    Route::prefix('downloads')->name('-downloads')->group(function () {
+        Route::get('{category_id?}/files', [DownloadController::class, 'index']);
+        Route::post('', [DownloadController::class, 'store'])->name('-store');
+        Route::patch('{download}', [DownloadController::class, 'update'])->name('-update');
+        Route::delete('{download}', [DownloadController::class, 'destroy'])->name('-destroy');
+        Route::patch('activate/{download}', [DownloadController::class, 'activate'])->name('-activate');
+        Route::patch('feature/{download}', [DownloadController::class, 'feature'])->name('-feature');
 
-// Web Routes
-Route::middleware(['web', 'download.permission', 'download.throttle'])->group(function () {
-    Route::get('/downloads/secure/{file}', [DownloadController::class, 'secureDownload'])
-        ->name('downloads.secure');
-    Route::get('/downloads/preview/{file}', [DownloadController::class, 'preview'])
-        ->name('downloads.preview');
+        Route::prefix('categories')->name('-categories')->group(function () {
+            Route::get('', [DownloadCategoryController::class, 'index']);
+            Route::post('', [DownloadCategoryController::class, 'store'])->name('-store');
+            Route::patch('{download_category}', [DownloadCategoryController::class, 'update'])->name('-update');
+            Route::delete('{download_category}', [DownloadCategoryController::class, 'destroy'])->name('-destroy');
+            Route::patch('activate/{download_category}', [DownloadCategoryController::class, 'activate'])->name('-activate');
+        });
+    });
 });

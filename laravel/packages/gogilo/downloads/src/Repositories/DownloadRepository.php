@@ -1,20 +1,18 @@
 <?php
 
-namespace App\Repositories;
+namespace Gogilo\Downloads\Repositories;
 
-use App\Models\Download;
+use Gogilo\Downloads\Models\Download;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Collection as SupportCollection;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use App\Interfaces\Repositories\DownloadRepositoryInterface;
 
 class DownloadRepository implements DownloadRepositoryInterface
 {
-    public function all(array $params = [], bool $mapped = false): array | Collection | SupportCollection | LengthAwarePaginator
+    public function all(array $params = [], bool $mapped = false): array|Collection|SupportCollection|LengthAwarePaginator
     {
         $query = Download::query();
 
-        // Handle search
         if (isset($params['search'])) {
             $search = $params['search'];
             $query->where(function ($q) use ($search) {
@@ -23,7 +21,7 @@ class DownloadRepository implements DownloadRepositoryInterface
                     ->orWhere('file_name', 'like', "%{$search}%")
                     ->orWhere('file_type', 'like', "%{$search}%")
                     ->orWhereHas('category', function ($q) use ($search) {
-                        $q->where('name', 'like', "%{$search}%")->orWhere('id');
+                        $q->where('name', 'like', "%{$search}%");
                     });
             });
         }
@@ -33,40 +31,39 @@ class DownloadRepository implements DownloadRepositoryInterface
                 $query->where('slug', $params['category_slug']);
             });
         }
+
         if (isset($params['category_id'])) {
             $query->where('download_category_id', $params['category_id']);
         }
 
-        // Handle eager loading of relations
         if (isset($params['relations']) && is_array($params['relations'])) {
             $query->with($params['relations']);
         }
 
-        // Handle pagination
         if (isset($params['paginate']) && $params['paginate']) {
-            $perPage = $params['per_page'] ?? 10; // Default to 10 items per page
+            $perPage = $params['per_page'] ?? 10;
+
             return $mapped
-                ? $query->paginate($perPage)->through(fn(Download $download) => $this->mapDownload($download))
+                ? $query->paginate($perPage)->through(fn (Download $download) => $this->mapDownload($download))
                 : $query->paginate($perPage);
         }
 
-        // Return all results without pagination
         return $mapped
-            ? $query->get()->map(fn(Download $download) => $this->mapDownload($download))
+            ? $query->get()->map(fn (Download $download) => $this->mapDownload($download))
             : $query->get();
     }
 
-    public function find($id, bool $mapped = false): null | Download | array
+    public function find($id, bool $mapped = false): null|Download|array
     {
         return $mapped
             ? $this->mapDownload(Download::find($id))
             : Download::find($id);
     }
 
-    public function create(array $data, bool $mapped = false): Download | array|bool
+    public function create(array $data, bool $mapped = false): Download|array|bool
     {
         try {
-            $download = new Download();
+            $download = new Download;
             $download->title = $data['title'];
             $download->slug = $data['slug'];
             $download->description = $data['description'] ?? null;
@@ -79,16 +76,13 @@ class DownloadRepository implements DownloadRepositoryInterface
             $download->is_active = $data['is_active'] ?? true;
             $download->save();
 
-            return ($mapped
-                ? $this->mapDownload($download)
-                : $download);
+            return $mapped ? $this->mapDownload($download) : $download;
         } catch (\Exception $e) {
-            // Log the error or handle it as needed
             return false;
         }
     }
 
-    public function update(Download $download, array $data, bool $mapped = false): Download | array | bool
+    public function update(Download $download, array $data, bool $mapped = false): Download|array|bool
     {
         try {
             $download->title = $data['title'] ?? $download->title;
@@ -105,7 +99,6 @@ class DownloadRepository implements DownloadRepositoryInterface
 
             return $mapped ? $this->mapDownload($download) : $download;
         } catch (\Exception $e) {
-            // Log the error or handle it as needed
             return false;
         }
     }
@@ -114,56 +107,44 @@ class DownloadRepository implements DownloadRepositoryInterface
     {
         try {
             $download->delete();
+
             return true;
         } catch (\Exception $e) {
-            // Log the error or handle it as needed
             return false;
         }
     }
 
-    public function getByCategory($categoryId, bool $paginate = false, bool $mapped = false): array | Collection | SupportCollection | LengthAwarePaginator
+    public function getByCategory($categoryId, bool $paginate = false, bool $mapped = false): array|Collection|SupportCollection|LengthAwarePaginator
     {
-        $downloads = null;
-        if ($paginate) {
-            $downloads = Download::where('download_category_id', $categoryId)->paginate(10);
-            $downloads = $mapped
-                ? $downloads->through(fn(Download $download) => $this->mapDownload($download))
-                : $downloads;
-        }
-
         $downloads = Download::where('download_category_id', $categoryId)->get();
         $downloads = $mapped
-            ? $downloads->map(fn(Download $download) => $this->mapDownload($download))
+            ? $downloads->map(fn (Download $download) => $this->mapDownload($download))
             : $downloads;
 
-        return $downloads; // Adjust pagination as needed
+        return $downloads;
     }
 
     public function activate(Download $download): bool
     {
         try {
-            // Toggle the is_active field
-            $download->is_active = !$download->is_active;
+            $download->is_active = ! $download->is_active;
             $download->save();
 
             return $download->is_active;
         } catch (\Exception $e) {
-            // Log the error or handle it as needed
-            throw new \Exception("Error toggling activation status: " . $e->getMessage());
+            throw new \Exception('Error toggling activation status: '.$e->getMessage());
         }
     }
 
     public function feature(Download $download): bool
     {
         try {
-            // Toggle the is_featured field
-            $download->is_featured = !$download->is_featured;
+            $download->is_featured = ! $download->is_featured;
             $download->save();
 
             return $download->is_featured;
         } catch (\Exception $e) {
-            // Log the error or handle it as needed
-            throw new \Exception("Error toggling feature status: " . $e->getMessage());
+            throw new \Exception('Error toggling feature status: '.$e->getMessage());
         }
     }
 
@@ -175,7 +156,7 @@ class DownloadRepository implements DownloadRepositoryInterface
             'description' => $download->description,
             'name' => $download->file_name,
             'type' => $download->file_type,
-            'category' => $download->category->name,
+            'category' => $download->category?->name,
             'size' => $download->file_size,
             'is_active' => $download->is_active,
             'is_featured' => $download->is_featured,

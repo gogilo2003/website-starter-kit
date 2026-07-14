@@ -1,23 +1,23 @@
 <?php
 
-use Inertia\Inertia;
-use Illuminate\Support\Facades\Route;
-use Illuminate\Foundation\Application;
-use App\Http\Controllers\WebController;
 use App\Http\Controllers\BrandController;
-use App\Http\Controllers\QuoteController;
-use App\Http\Controllers\SlideController;
-use App\Http\Controllers\ElementController;
-use App\Http\Controllers\PartnerController;
-use App\Http\Controllers\ProductController;
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\DownloadController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ElementController;
 use App\Http\Controllers\MigrationController;
 use App\Http\Controllers\NewsArticleController;
 use App\Http\Controllers\PageSectionController;
+use App\Http\Controllers\PartnerController;
 use App\Http\Controllers\ProductCategoryController;
-use App\Http\Controllers\DownloadCategoryController;
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\QuoteController;
+use App\Http\Controllers\SlideController;
+use App\Http\Controllers\WebController;
+use Illuminate\Foundation\Application;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
 
 // Route::get('/', function () {
 //     return Inertia::render('Welcome', [
@@ -29,15 +29,15 @@ use App\Http\Controllers\DownloadCategoryController;
 // });
 
 Route::get('/run-migrations/{key}', function ($key) {
-    if (!\Illuminate\Support\Facades\Hash::check(
+    if (! Hash::check(
         $key,
         '$2y$12$TJeyinZ7.dsHRh9QghNZMe8uDJpVF9wjAY2qpV3NTi8H4Q7Q4.07i'
     )) {
-        return "Invalid key";
+        return 'Invalid key';
     }
 
-    \Illuminate\Support\Facades\Artisan::call('migrate', ["--force" => true]);
-    $output = \Illuminate\Support\Facades\Artisan::output();
+    Artisan::call('migrate', ['--force' => true]);
+    $output = Artisan::output();
 
     // Remove this route after successful execution
     $routeFilePath = base_path('routes/web.php');
@@ -45,7 +45,7 @@ Route::get('/run-migrations/{key}', function ($key) {
     $routeFileContent = preg_replace('/Route::get$$\'\/run-migrations\/.*?\}$$;/s', '', $routeFileContent);
     file_put_contents($routeFilePath, $routeFileContent);
 
-    return 'Migrations completed. Output: ' . nl2br($output);
+    return 'Migrations completed. Output: '.nl2br($output);
 });
 
 Route::controller(WebController::class)
@@ -58,12 +58,12 @@ Route::controller(WebController::class)
         Route::get('/downloads/{slug?}', 'downloads')->name('downloads');
         Route::get('/download/{slug}', 'download')->name('download');
         Route::get('/contact', 'contact')->name('contact');
-        Route::get('/quote',  'quote')->name('quote');
-        Route::get('/quote/track/{code}',  'quoteTrack')->name('quote-track');
-        Route::get('/quote/download/{code}',  'quoteDownload')->name('quote-download');
-        Route::post('/quote/request',  'quoteRequest')->name('quote-request');
-        Route::post('/wishlist/add',  'wishlistAdd')->name('wishlist-add');
-        Route::delete('/wishlist/remove',  'wishlistRemove')->name('wishlist-remove');
+        Route::get('/quote', 'quote')->name('quote');
+        Route::get('/quote/track/{code}', 'quoteTrack')->name('quote-track');
+        Route::get('/quote/download/{code}', 'quoteDownload')->name('quote-download');
+        Route::post('/quote/request', 'quoteRequest')->name('quote-request');
+        Route::post('/wishlist/add', 'wishlistAdd')->name('wishlist-add');
+        Route::delete('/wishlist/remove', 'wishlistRemove')->name('wishlist-remove');
     });
 
 Route::middleware([
@@ -152,22 +152,6 @@ Route::middleware([
         Route::patch('items/{item}', [QuoteController::class, 'updateQuoteItem'])->name('-items-update');
     });
 
-    Route::prefix('downloads')->name('-downloads')->group(function () {
-        Route::get('{category_id?}/files', [DownloadController::class, 'index']);
-        Route::post('', [DownloadController::class, 'store'])->name('-store');
-        Route::patch('{download}', [DownloadController::class, 'update'])->name('-update');
-        Route::delete('{download}', [DownloadController::class, 'destroy'])->name('-destroy');
-        Route::patch('activate/{download}', [DownloadController::class, 'activate'])->name('-activate');
-        Route::patch('feature/{download}', [DownloadController::class, 'feature'])->name('-feature');
-
-        Route::prefix('categories')->name('-categories')->group(function () {
-            Route::get('', [DownloadCategoryController::class, 'index']);
-            Route::post('', [DownloadCategoryController::class, 'store'])->name('-store');
-            Route::patch('{download_category}', [DownloadCategoryController::class, 'update'])->name('-update');
-            Route::delete('{download_category}', [DownloadCategoryController::class, 'destroy'])->name('-destroy');
-            Route::patch('activate/{download_category}', [DownloadCategoryController::class, 'activate'])->name('-activate');
-        });
-    });
 });
 
 Route::middleware('auth')->group(function () {
@@ -177,4 +161,4 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-require __DIR__ . '/auth.php';
+require __DIR__.'/auth.php';
