@@ -1,0 +1,25 @@
+{
+    "name": "gogilo/slides",
+    "description": "Slides content-type package for Laravel starter kit.",
+    "type": "library",
+    "license": "MIT",
+    "require": {
+        "php": "^8.3",
+        "gogilo/menu": "*",
+        "illuminate/support": "^13.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Gogilo\\Slides\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Gogilo\\Slides\\SlidesServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}

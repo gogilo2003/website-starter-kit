@@ -1,0 +1,25 @@
+{
+    "name": "gogilo/page-sections",
+    "description": "Page Sections and Elements content-type package for Laravel starter kit.",
+    "type": "library",
+    "license": "MIT",
+    "require": {
+        "php": "^8.3",
+        "gogilo/menu": "*",
+        "illuminate/support": "^13.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Gogilo\\PageSections\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Gogilo\\PageSections\\PageSectionsServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}

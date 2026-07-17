@@ -1,14 +1,9 @@
 <?php
 
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\ElementController;
 use App\Http\Controllers\MigrationController;
-use App\Http\Controllers\NewsArticleController;
-use App\Http\Controllers\PageSectionController;
-use App\Http\Controllers\PartnerController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\QuoteController;
-use App\Http\Controllers\SlideController;
 use App\Http\Controllers\WebController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Artisan;
@@ -59,6 +54,7 @@ Route::controller(WebController::class)
         Route::get('/quote/track/{code}', 'quoteTrack')->name('quote-track');
         Route::get('/quote/download/{code}', 'quoteDownload')->name('quote-download');
         Route::post('/quote/request', 'quoteRequest')->name('quote-request');
+        Route::get('/news/{slug?}', 'news')->name('news');
         Route::post('/wishlist/add', 'wishlistAdd')->name('wishlist-add');
         Route::delete('/wishlist/remove', 'wishlistRemove')->name('wishlist-remove');
     });
@@ -77,45 +73,10 @@ Route::middleware([
         Route::post('/rollback', [MigrationController::class, 'rollbackMigrations'])->name('-rollback');
     });
 
-    Route::prefix('page_sections')->name('-page-sections')->group(function () {
-        Route::get('', [PageSectionController::class, 'index']);
-        Route::post('', [PageSectionController::class, 'store'])->name('-store');
-        Route::patch('{page_section}', [PageSectionController::class, 'update'])->name('-update');
-        Route::delete('{page_section}', [PageSectionController::class, 'destroy'])->name('-destroy');
-        Route::patch('publish/{page_section}', [PageSectionController::class, 'publish'])->name('-publish');
-        Route::patch('sync-elements/{page_section}', [PageSectionController::class, 'syncElements'])->name('-sync-elements');
-    });
-    Route::prefix('elements')->name('-elements')->group(function () {
-        Route::get('', [ElementController::class, 'index']);
-        Route::post('', [ElementController::class, 'store'])->name('-store');
-        Route::patch('{element}', [ElementController::class, 'update'])->name('-update');
-        Route::delete('{element}', [ElementController::class, 'destroy'])->name('-destroy');
-        Route::patch('publish/{element}', [ElementController::class, 'publish'])->name('-publish');
-    });
-    Route::prefix('slides')->name('-slides')->group(function () {
-        Route::get('', [SlideController::class, 'index']);
-        Route::post('', [SlideController::class, 'store'])->name('-store');
-        Route::patch('{slide}', [SlideController::class, 'update'])->name('-update');
-        Route::delete('{slide}', [SlideController::class, 'destroy'])->name('-destroy');
-        Route::patch('publish/{slide}', [SlideController::class, 'publish'])->name('-publish');
-        Route::patch('promote/{slide}', [SlideController::class, 'promote'])->name('-promote');
-    });
-    Route::prefix('partners')->name('-partners')->group(function () {
-        Route::get('', [PartnerController::class, 'index']);
-        Route::post('', [PartnerController::class, 'store'])->name('-store');
-        Route::patch('{partner}', [PartnerController::class, 'update'])->name('-update');
-        Route::delete('{partner}', [PartnerController::class, 'destroy'])->name('-destroy');
-        Route::patch('publish/{partner}', [PartnerController::class, 'publish'])->name('-publish');
-        Route::patch('promote/{partner}', [PartnerController::class, 'promote'])->name('-promote');
-    });
-    Route::prefix('news_articles')->name('-news_articles')->group(function () {
-        Route::get('', [NewsArticleController::class, 'index']);
-        Route::post('', [NewsArticleController::class, 'store'])->name('-store');
-        Route::patch('{news_article}', [NewsArticleController::class, 'update'])->name('-update');
-        Route::delete('{news_article}', [NewsArticleController::class, 'destroy'])->name('-destroy');
-        Route::patch('publish/{news_article}', [NewsArticleController::class, 'publish'])->name('-publish');
-        Route::patch('promote/{news_article}', [NewsArticleController::class, 'promote'])->name('-promote');
-    });
+
+
+
+
 
     Route::prefix('quotes')->name('-quotes')->group(function () {
         Route::get('', [QuoteController::class, 'index']);

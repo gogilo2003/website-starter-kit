@@ -14,7 +14,12 @@
         "gogilo/breeze": "*",
         "gogilo/downloads": "@dev",
         "gogilo/menu": "@dev",
+        "gogilo/news": "@dev",
+        "gogilo/page-sections": "@dev",
+        "gogilo/partners": "@dev",
         "gogilo/products": "@dev",
+        "gogilo/quotes": "@dev",
+        "gogilo/slides": "@dev",
         "inertiajs/inertia-laravel": "^2.0",
         "laravel/framework": "^13.0",
         "laravel/sanctum": "^4.0",
@@ -100,6 +105,41 @@
         {
             "type": "path",
             "url": "packages/gogilo/products",
+            "options": {
+                "symlink": true
+            }
+        },
+        {
+            "type": "path",
+            "url": "packages/gogilo/slides",
+            "options": {
+                "symlink": true
+            }
+        },
+        {
+            "type": "path",
+            "url": "packages/gogilo/news",
+            "options": {
+                "symlink": true
+            }
+        },
+        {
+            "type": "path",
+            "url": "packages/gogilo/page-sections",
+            "options": {
+                "symlink": true
+            }
+        },
+        {
+            "type": "path",
+            "url": "packages/gogilo/partners",
+            "options": {
+                "symlink": true
+            }
+        },
+        {
+            "type": "path",
+            "url": "packages/gogilo/quotes",
             "options": {
                 "symlink": true
             }

@@ -2,7 +2,7 @@
 
 namespace App\Http\Middleware;
 
-use App\Models\Element;
+use Gogilo\PageSections\Models\Element;
 use Gogilo\Menu\MenuRegistry;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
@@ -108,7 +108,7 @@ class HandleInertiaRequests extends Middleware
         $contact['address'] = $address ? $address->content : null;
         $contact['location'] = $location ? $location->content : null;
         $props['contact'] = $contact;
-        $props['call'] = $phone->content;
+        $props['call'] = $phone ? $phone->content : null;
 
         return $props;
     }

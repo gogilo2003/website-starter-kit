@@ -7,8 +7,8 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\File as FileFacade;
 use Illuminate\Support\Str;
-use App\Services\ProductService;
-use App\Services\ProductCategoryService;
+use Gogilo\Products\Services\ProductService;
+use Gogilo\Products\Services\ProductCategoryService;
 
 class ProductCategorySeeder extends Seeder
 {

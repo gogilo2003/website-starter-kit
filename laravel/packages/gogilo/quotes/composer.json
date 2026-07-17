@@ -1,0 +1,26 @@
+{
+    "name": "gogilo/quotes",
+    "description": "Quotes content-type package for Laravel starter kit.",
+    "type": "library",
+    "license": "MIT",
+    "require": {
+        "php": "^8.3",
+        "gogilo/menu": "*",
+        "gogilo/products": "*",
+        "illuminate/support": "^13.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Gogilo\\Quotes\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Gogilo\\Quotes\\QuotesServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}

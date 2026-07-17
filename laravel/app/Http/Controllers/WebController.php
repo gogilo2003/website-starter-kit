@@ -5,11 +5,17 @@ namespace App\Http\Controllers;
 use App\Http\Requests\RequestQuoteRequest;
 use App\Http\Requests\SendFeedbackRequest;
 use App\Mail\WebFeedback;
-use App\Models\Element;
-use App\Models\NewsArticle;
-use App\Models\PageSection;
+use Gogilo\PageSections\Models\Element;
+use Gogilo\News\Models\NewsArticle;
+use Gogilo\PageSections\Models\PageSection;
 use App\Models\Picture;
+use Gogilo\Partners\Models\Partner;
+use App\Support\Util;
+use Gogilo\Slides\Models\Slide;
 use App\Services\QuoteService;
+use Gogilo\PageSections\Services\PageSectionService;
+use Gogilo\Downloads\Services\DownloadCategoryService;
+use Gogilo\Downloads\Services\DownloadService;
 use Gogilo\Products\Models\Product;
 use Gogilo\Products\Services\ProductCategoryService;
 use Illuminate\Support\Facades\Mail;
@@ -101,13 +107,13 @@ class WebController extends Controller
             'partners' => $partners,
             'customers' => $customers,
             'categories' => $categories,
-            'welcome' => [
+            'welcome' => $welcome ? [
                 'id' => $welcome->id,
                 'title' => $welcome->title,
                 'content' => $welcome->content,
                 'icon' => $welcome->icon,
                 'photo' => Util::pictureUrl($welcome->photo),
-            ],
+            ] : null,
             'industriesSection' => $industriesSection ? (object) [
                 'id' => $industriesSection->id,
                 'title' => $industriesSection->title,

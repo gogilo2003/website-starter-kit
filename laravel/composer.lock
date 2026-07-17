@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "2abb51cbce20f686d3ca87e6c31a6f9b",
+    "content-hash": "4db8ad02302b81c35d699a595b1fada1",
     "packages": [
         {
             "name": "barryvdh/laravel-dompdf",
@@ -970,6 +970,111 @@
             }
         },
         {
+            "name": "gogilo/news",
+            "version": "dev-main",
+            "dist": {
+                "type": "path",
+                "url": "packages/gogilo/news",
+                "reference": "3cbd111c232a2e7f9ec61c2a253e1a6b091c32a5"
+            },
+            "require": {
+                "gogilo/menu": "*",
+                "illuminate/support": "^13.0",
+                "php": "^8.3"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Gogilo\\News\\NewsServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Gogilo\\News\\": "src/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "description": "News content-type package for Laravel starter kit.",
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
+            "name": "gogilo/page-sections",
+            "version": "dev-main",
+            "dist": {
+                "type": "path",
+                "url": "packages/gogilo/page-sections",
+                "reference": "413646b78dce08885c2b99da782e9366fd4172ee"
+            },
+            "require": {
+                "gogilo/menu": "*",
+                "illuminate/support": "^13.0",
+                "php": "^8.3"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Gogilo\\PageSections\\PageSectionsServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Gogilo\\PageSections\\": "src/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "description": "Page Sections and Elements content-type package for Laravel starter kit.",
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
+            "name": "gogilo/partners",
+            "version": "dev-main",
+            "dist": {
+                "type": "path",
+                "url": "packages/gogilo/partners",
+                "reference": "fcc2a93f7c2b91e19409fa1b7536067f851dd701"
+            },
+            "require": {
+                "gogilo/menu": "*",
+                "illuminate/support": "^13.0",
+                "php": "^8.3"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Gogilo\\Partners\\PartnersServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Gogilo\\Partners\\": "src/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "description": "Partners content-type package for Laravel starter kit.",
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
             "name": "gogilo/products",
             "version": "dev-main",
             "dist": {
@@ -999,6 +1104,41 @@
                 "MIT"
             ],
             "description": "Products content-type package for Laravel starter kit.",
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
+            "name": "gogilo/slides",
+            "version": "dev-main",
+            "dist": {
+                "type": "path",
+                "url": "packages/gogilo/slides",
+                "reference": "9f9971300bf001dd3016dcd19ca2ce2d8b3041e1"
+            },
+            "require": {
+                "gogilo/menu": "*",
+                "illuminate/support": "^13.0",
+                "php": "^8.3"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Gogilo\\Slides\\SlidesServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Gogilo\\Slides\\": "src/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "description": "Slides content-type package for Laravel starter kit.",
             "transport-options": {
                 "symlink": true,
                 "relative": true
@@ -10870,13 +11010,17 @@
     "stability-flags": {
         "gogilo/downloads": 20,
         "gogilo/menu": 20,
-        "gogilo/products": 20
+        "gogilo/news": 20,
+        "gogilo/page-sections": 20,
+        "gogilo/partners": 20,
+        "gogilo/products": 20,
+        "gogilo/slides": 20
     },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
         "php": "^8.3"
     },
-    "platform-dev": [],
-    "plugin-api-version": "2.6.0"
+    "platform-dev": {},
+    "plugin-api-version": "2.9.0"
 }
