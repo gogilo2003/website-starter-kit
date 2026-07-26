@@ -2,8 +2,8 @@
 
 namespace App\Providers;
 
-use Gogilo\Menu\MenuItem;
-use Gogilo\Menu\MenuRegistry;
+use MeaCms\Menu\MenuItem;
+use MeaCms\Menu\MenuRegistry;
 use Illuminate\Support\ServiceProvider;
 
 class MenuServiceProvider extends ServiceProvider
@@ -24,13 +24,7 @@ class MenuServiceProvider extends ServiceProvider
                 route: 'dashboard',
                 order: 10,
             ),
-            new MenuItem(
-                name: 'dashboard-quotes',
-                caption: 'Quotes',
-                icon: 'clipboard',
-                route: 'dashboard-quotes',
-                order: 20,
-            ),
+
             new MenuItem(
                 name: 'dashboard-migrations',
                 caption: 'Migrations',

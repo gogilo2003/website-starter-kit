@@ -8,7 +8,7 @@ import WebHeader from '@/Layouts/WebHeader.vue';
 import WebLayout from '@/Layouts/WebLayout.vue';
 import { useForm } from '@inertiajs/vue3';
 import Swal from 'sweetalert2';
-import { iContact } from '../interfaces';
+import { iContact } from '@/interfaces';
 
 const props = defineProps({
     contacts: Array<iContact>,

@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\VisitTracker;
+use MeaCms\Menu\Services\VisitTracker;
 use Inertia\Inertia;
 use Illuminate\Http\Request;
 

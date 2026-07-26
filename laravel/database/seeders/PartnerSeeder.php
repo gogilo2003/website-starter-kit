@@ -78,7 +78,7 @@ class PartnerSeeder extends Seeder
             $published = $partner['published'];
             $front = $partner['front'];
 
-            $partnerModel = new \Gogilo\Partners\Models\Partner();
+            $partnerModel = new \MeaCms\Partners\Models\Partner();
             $partnerModel->title = $title;
             $partnerModel->slug = $slug;
             $partnerModel->logo = $filename;

@@ -44,7 +44,7 @@ class BrandSeeder extends Seeder
 
         Storage::disk('public')->makeDirectory('brands');
         Schema::disableForeignKeyConstraints();
-        \Gogilo\Products\Models\Brand::truncate();
+        \MeaCms\Products\Models\Brand::truncate();
         Schema::enableForeignKeyConstraints();
         foreach ($brands as $brand) {
             $path = $brand['logo'] ? storage_path('data/images/' . $brand['logo']) : null;
@@ -56,7 +56,7 @@ class BrandSeeder extends Seeder
 
             $name = $brand['name'];
 
-            $brandModel = new \Gogilo\Products\Models\Brand();
+            $brandModel = new \MeaCms\Products\Models\Brand();
             $brandModel->name = $name;
             $brandModel->logo = $filename;
             $brandModel->save();

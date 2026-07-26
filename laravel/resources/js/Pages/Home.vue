@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import Container from '@/Components/Container.vue';
 import Icon from '@/Components/Icons/Icon.vue';
-import ProductCategoryCard from '@/Components/Web/ProductCategoryCard.vue';
+import ProductCategoryCard from '@meacms/products/Components/Web/ProductCategoryCard.vue';
 import { iElement, iProduct, iProductCategory, iSlide } from '@/interfaces';
 import Hero from '@/Layouts/Hero.vue';
 import WebLayout from '@/Layouts/WebLayout.vue';
 import { Link } from '@inertiajs/vue3';
 import Heading from '../Components/Web/Heading.vue';
 import Heading1 from '../Components/Web/Heading1.vue';
-import ProductCard from '../Components/Web/ProductCard.vue';
+import ProductCard from '@meacms/products/Components/Web/ProductCard.vue';
 
 interface Section {
     title: string;

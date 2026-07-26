@@ -297,7 +297,7 @@ ADDRESS,
                 $icon = $element['icon'];
                 $published = $element['published'];
 
-                $element = new \Gogilo\PageSections\Models\Element();
+                $element = new \MeaCms\PageSections\Models\Element();
 
                 $element->name = $name;
                 $element->title = $title;
@@ -377,12 +377,12 @@ ADDRESS,
 
         $sections->each(
             function ($section) {
-                $pageSection = new \Gogilo\PageSections\Models\PageSection();
+                $pageSection = new \MeaCms\PageSections\Models\PageSection();
                 $pageSection->name = $section['name'];
                 $pageSection->title = $section['title'];
                 $pageSection->description = $section['description'];
                 $pageSection->save();
-                $elementIds = \Gogilo\PageSections\Models\Element::whereIn('name', $section['elements'])->pluck('id')->toArray();
+                $elementIds = \MeaCms\PageSections\Models\Element::whereIn('name', $section['elements'])->pluck('id')->toArray();
                 $pageSection->elements()->sync($elementIds);
             }
         );

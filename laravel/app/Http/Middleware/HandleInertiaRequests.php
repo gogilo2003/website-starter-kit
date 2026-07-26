@@ -2,8 +2,8 @@
 
 namespace App\Http\Middleware;
 
-use Gogilo\PageSections\Models\Element;
-use Gogilo\Menu\MenuRegistry;
+use MeaCms\PageSections\Models\Element;
+use MeaCms\Menu\MenuRegistry;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 use Tighten\Ziggy\Ziggy;

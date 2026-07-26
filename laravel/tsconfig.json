@@ -13,7 +13,32 @@
         "skipLibCheck": true,
         "paths": {
             "@/*": [
-                "./resources/js/*"
+                "./resources/js/*",
+                "./packages/meacms/menu/resources/js/*"
+            ],
+            "@meacms/menu/*": [
+                "./packages/meacms/menu/resources/js/*"
+            ],
+            "@meacms/products/*": [
+                "./packages/meacms/products/resources/js/*"
+            ],
+            "@meacms/quotes/*": [
+                "./packages/meacms/quotes/resources/js/*"
+            ],
+            "@meacms/news/*": [
+                "./packages/meacms/news/resources/js/*"
+            ],
+            "@meacms/downloads/*": [
+                "./packages/meacms/downloads/resources/js/*"
+            ],
+            "@meacms/partners/*": [
+                "./packages/meacms/partners/resources/js/*"
+            ],
+            "@meacms/slides/*": [
+                "./packages/meacms/slides/resources/js/*"
+            ],
+            "@meacms/page-sections/*": [
+                "./packages/meacms/page-sections/resources/js/*"
             ],
             "ziggy-js": [
                 "./vendor/tightenco/ziggy"
@@ -26,6 +51,8 @@
     },
     "include": [
         "resources/js/**/*.ts",
-        "resources/js/**/*.vue"
+        "resources/js/**/*.vue",
+        "packages/meacms/*/resources/js/**/*.ts",
+        "packages/meacms/*/resources/js/**/*.vue"
     ]
 }

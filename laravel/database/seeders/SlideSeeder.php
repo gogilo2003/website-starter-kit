@@ -62,7 +62,7 @@ class SlideSeeder extends Seeder
             $caption = $slide['caption'];
             $media_type = $slide['medi_type'];
             $published = $slide['published'];
-            $slide = new \Gogilo\Slides\Models\Slide();
+            $slide = new \MeaCms\Slides\Models\Slide();
             $slide->title = $title;
             $slide->caption = $caption;
             $slide->picture = $filename;

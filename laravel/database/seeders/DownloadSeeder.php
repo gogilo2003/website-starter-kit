@@ -2,10 +2,10 @@
 
 namespace Database\Seeders;
 
-use Gogilo\Downloads\Models\Download;
+use MeaCms\Downloads\Models\Download;
 use Illuminate\Support\Str;
 use Illuminate\Database\Seeder;
-use Gogilo\Downloads\Models\DownloadCategory;
+use MeaCms\Downloads\Models\DownloadCategory;
 use Illuminate\Http\UploadedFile;
 use App\Services\FileUploadService;
 use Illuminate\Support\Facades\Storage;

@@ -2,7 +2,7 @@
 import { iSlide } from '@/interfaces';
 import { initFlowbite } from 'flowbite';
 import { onMounted } from 'vue';
-import FeaturedCustomers from '../Components/Web/FeaturedCustomers.vue';
+import FeaturedCustomers from '@meacms/partners/Components/Web/FeaturedCustomers.vue';
 
 defineProps<{
     slides: iSlide[];

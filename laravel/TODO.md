@@ -1,6 +1,6 @@
 # Package Extraction TODO
 
-- [ ] Create `gogilo/products` package skeleton under `laravel/packages/gogilo/products`
+- [ ] Create `meacms/products` package skeleton under `laravel/packages/meacms/products`
 - [ ] Add package `composer.json` with Laravel auto-discovery
 - [ ] Add `ProductsServiceProvider`
 - [ ] Add `products:install` Artisan command

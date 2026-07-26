@@ -3,7 +3,6 @@
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\MigrationController;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\QuoteController;
 use App\Http\Controllers\WebController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Artisan;
@@ -78,14 +77,7 @@ Route::middleware([
 
 
 
-    Route::prefix('quotes')->name('-quotes')->group(function () {
-        Route::get('', [QuoteController::class, 'index']);
-        Route::post('', [QuoteController::class, 'store'])->name('-store');
-        Route::patch('{quote}', [QuoteController::class, 'update'])->name('-update');
-        Route::delete('{quote}', [QuoteController::class, 'destroy'])->name('-destroy');
-        Route::patch('status/{quote}', [QuoteController::class, 'updateStatus'])->name('-status');
-        Route::patch('items/{item}', [QuoteController::class, 'updateQuoteItem'])->name('-items-update');
-    });
+
 
 });
 
@@ -97,3 +89,5 @@ Route::middleware('auth')->group(function () {
 });
 
 require __DIR__.'/auth.php';
+
+Route::get('/test-page', [\App\Http\Controllers\TestPageController::class, '__invoke'])->name('test-page');

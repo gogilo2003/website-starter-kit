@@ -2,22 +2,22 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\RequestQuoteRequest;
+use MeaCms\Quotes\Http\Requests\RequestQuoteRequest;
 use App\Http\Requests\SendFeedbackRequest;
 use App\Mail\WebFeedback;
-use Gogilo\PageSections\Models\Element;
-use Gogilo\News\Models\NewsArticle;
-use Gogilo\PageSections\Models\PageSection;
-use App\Models\Picture;
-use Gogilo\Partners\Models\Partner;
-use App\Support\Util;
-use Gogilo\Slides\Models\Slide;
-use App\Services\QuoteService;
-use Gogilo\PageSections\Services\PageSectionService;
-use Gogilo\Downloads\Services\DownloadCategoryService;
-use Gogilo\Downloads\Services\DownloadService;
-use Gogilo\Products\Models\Product;
-use Gogilo\Products\Services\ProductCategoryService;
+use MeaCms\PageSections\Models\Element;
+use MeaCms\News\Models\NewsArticle;
+use MeaCms\PageSections\Models\PageSection;
+use MeaCms\Menu\Models\Picture;
+use MeaCms\Partners\Models\Partner;
+use MeaCms\Menu\Support\Util;
+use MeaCms\Slides\Models\Slide;
+use MeaCms\Quotes\Services\QuoteService;
+use MeaCms\PageSections\Services\PageSectionService;
+use MeaCms\Downloads\Services\DownloadCategoryService;
+use MeaCms\Downloads\Services\DownloadService;
+use MeaCms\Products\Models\Product;
+use MeaCms\Products\Services\ProductCategoryService;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
